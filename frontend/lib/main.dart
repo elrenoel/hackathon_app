@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hackathon_app/pages/read_task_page.dart';
 import 'package:hackathon_app/providers/todo_provider.dart';
-import 'package:hackathon_app/splash_lottie_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashLottiePage(),
+      home: const ReadTaskPage(),
     );
   }
 }
