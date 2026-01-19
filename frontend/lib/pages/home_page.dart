@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/pages/focus_timer.dart';
+import 'package:hackathon_app/pages/input_goal_page.dart';
 import 'package:hackathon_app/providers/todo_provider.dart';
 import 'package:hackathon_app/widgets/emotion_btn.dart';
 import 'package:provider/provider.dart';
@@ -58,11 +59,36 @@ class _HomePageState extends State<HomePage> {
     final todos = todoProvider.todos;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 60, right: 20, left: 20),
+      padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Hi User!", style: Theme.of(context).textTheme.labelLarge),
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(1, 1),
+                      blurRadius: 3,
+                      // ignore: deprecated_member_use
+                      color: Colors.black.withOpacity(0.15),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: Image.asset('assets/icons/bro.jpg', fit: BoxFit.cover),
+                ),
+              ),
+              SizedBox(width: 10),
+              Text("Hi User!", style: Theme.of(context).textTheme.labelLarge),
+            ],
+          ),
           SizedBox(height: 50),
           Center(
             child: Column(
@@ -176,7 +202,14 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                               IconButton(
-                                onPressed: addTodo,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => InputGoalPage(),
+                                    ),
+                                  );
+                                },
                                 icon: Image.asset('assets/icons/add.png'),
                               ),
                             ],
@@ -431,6 +464,52 @@ class _HomePageState extends State<HomePage> {
                       ),
 
                       // End List Todo today
+                      SizedBox(height: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'For you',
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: const Offset(1, 1),
+                                  blurRadius: 6,
+                                  // ignore: deprecated_member_use
+                                  color: Colors.black.withOpacity(0.15),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Short sessions Deep Read (7–10 minutes) & Based on your mood & schedule',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.displayMedium,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Image.asset(
+                                    'assets/icons/arrow.png',
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),

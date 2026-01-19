@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hackathon_app/pages/read_task_page.dart';
+import 'package:hackathon_app/main_app.dart';
 import 'package:hackathon_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -30,16 +30,17 @@ class MyApp extends StatelessWidget {
             headlineSmall: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
             labelLarge: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 20,
+              fontSize: 24,
             ), // semibold // bold
             labelMedium: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             labelSmall: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             bodyLarge: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-            bodyMedium: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+            bodySmall: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+            displayMedium: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
         ),
       ),
-      home: const ReadTaskPage(),
+      home: const MainApp(),
     );
   }
 }
