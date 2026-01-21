@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hackathon_app/main_app.dart';
-import 'package:hackathon_app/providers/todo_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:hackathon_app/pages/welcome_page.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(create: (_) => TodoProvider(), child: const MyApp()),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,31 +12,34 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App',
+      title: 'Neura',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-        textTheme: GoogleFonts.instrumentSansTextTheme(
-          const TextTheme(
-            headlineLarge: TextStyle(fontWeight: FontWeight.w700, fontSize: 32),
-            headlineMedium: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 24,
-            ),
-            headlineSmall: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-            labelLarge: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 24,
-            ), // semibold // bold
-            labelMedium: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-            labelSmall: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-            bodyLarge: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-            bodySmall: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-            displayMedium: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        textTheme: TextTheme(
+          headlineLarge: GoogleFonts.poppins(
+            textStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          headlineMedium: GoogleFonts.poppins(
+            textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          headlineSmall: GoogleFonts.poppins(
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          bodyMedium: GoogleFonts.roboto(
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          bodySmall: GoogleFonts.roboto(
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          labelMedium: GoogleFonts.roboto(
+            textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+          labelSmall: GoogleFonts.roboto(
+            textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
           ),
         ),
       ),
-      home: const MainApp(),
+      home: const WelcomePage(),
     );
   }
 }

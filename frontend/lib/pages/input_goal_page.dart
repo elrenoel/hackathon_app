@@ -1,4 +1,37 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/widgets/input_new_goal_widget/duration_time_task.dart';
+import 'package:hackathon_app/widgets/input_new_goal_widget/field_task_title.dart';
+import 'package:hackathon_app/widgets/input_new_goal_widget/reminder_task.dart';
+import 'package:hackathon_app/widgets/input_new_goal_widget/start_time_task.dart';
+import 'package:hackathon_app/widgets/input_new_goal_widget/sub_task_section.dart';
+
+class Task {
+  final String title;
+  final String durationTime;
+  final String startTime;
+  final List<SubTask> subTasks;
+  final String reminder;
+  final bool goalsDone;
+
+  Task({
+    required this.title,
+    required this.durationTime,
+    required this.startTime,
+    required this.subTasks,
+    required this.reminder,
+    required this.goalsDone,
+  });
+}
+
+class SubTask {
+  final String title;
+  bool isDone;
+
+  SubTask({required this.title, this.isDone = false});
+
+  Map<String, dynamic> toJson() => {'title': title, 'isDone': isDone};
+}
 
 class InputGoalPage extends StatefulWidget {
   const InputGoalPage({super.key});
@@ -8,13 +41,78 @@ class InputGoalPage extends StatefulWidget {
 }
 
 class _InputGoalPageState extends State<InputGoalPage> {
+  String valueTaskTitle = '';
+  int? valueDurationHours;
+  int? valueDurationMinutes;
+  final TextEditingController startTimeController = TextEditingController();
+  String? valueReminder;
+  List<SubTask> subTasks = [];
+  List<Map<String, dynamic>> tasks = [];
+  bool goalsDone = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Color(0xFFF5F5F5),
+          boxShadow: [
+            BoxShadow(
+              offset: const Offset(0, 4),
+              blurRadius: 20,
+              spreadRadius: 2,
+              // ignore: deprecated_member_use
+              color: Colors.black.withOpacity(0.15),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          child: ElevatedButton(
+            onPressed: () {
+              final task = Task(
+                title: valueTaskTitle,
+                durationTime:
+                    '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min',
+                startTime: startTimeController.text,
+                subTasks: subTasks,
+                reminder: valueReminder ?? '',
+                goalsDone: goalsDone,
+              );
+
+              Navigator.pop(context, task);
+
+              setState(() {
+                tasks.add({
+                  'title': valueTaskTitle,
+                  'durationTime':
+                      '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min',
+                  'starTime': startTimeController.text,
+                  'subTasks': subTasks.map((s) => s.toJson()).toList(),
+                  'reminder': valueReminder,
+                  'goalsDone': goalsDone,
+                });
+
+                // ignore: avoid_print
+                print(const JsonEncoder.withIndent('  ').convert(tasks));
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+            child: Text(
+              'Submit',
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+        padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
         child: Column(
           children: [
+            // Header
             Row(
               children: [
                 Container(
@@ -38,59 +136,50 @@ class _InputGoalPageState extends State<InputGoalPage> {
                   ),
                 ),
                 SizedBox(width: 10),
-                Text('New Goal'),
+                Text(
+                  'New Goal',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
               ],
+            ),
+
+            SizedBox(height: 20),
+
+            FieldTaskTitle(
+              onChanged: (value) {
+                valueTaskTitle = value;
+              },
             ),
 
             SizedBox(height: 10),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Task Title'),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'enter task title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
+            DurationTimeTask(
+              onChangedHours: (value) {
+                valueDurationHours = value;
+              },
+              onChangedMinutes: (value) {
+                valueDurationMinutes = value;
+              },
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Task Title'),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'enter task title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
+
+            SizedBox(height: 10),
+
+            StartTimeTask(controller: startTimeController),
+
+            SizedBox(height: 10),
+
+            ReminderTask(
+              onChangedReminder: (value) {
+                valueReminder = value;
+              },
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Duration'),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'enter task title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Reminder'),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'enter task title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
+
+            SizedBox(height: 10),
+
+            SubTaskSection(
+              onChanged: (List<SubTask> value) {
+                subTasks = value;
+              },
             ),
           ],
         ),

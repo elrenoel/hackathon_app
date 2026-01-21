@@ -253,8 +253,16 @@ class _TargetItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade300,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(1, 1),
+            blurRadius: 6,
+            // ignore: deprecated_member_use
+            color: Colors.black.withOpacity(0.15),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
