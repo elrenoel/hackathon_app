@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/pages/sign_in_page.dart';
+import 'package:hackathon_app/pages/sign_in/sign_in_page.dart';
 
 class SignUpDone extends StatelessWidget {
   const SignUpDone({super.key});

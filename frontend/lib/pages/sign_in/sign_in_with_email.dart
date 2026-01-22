@@ -1,76 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/pages/sign_up/sign_up_done.dart';
-import 'package:hackathon_app/widgets/sign_up_widget/requirement_item.dart';
-import 'package:hackathon_app/widgets/sign_up_widget/step_indicator.dart';
 
-class SignUpCreatePassword extends StatefulWidget {
-  const SignUpCreatePassword({super.key});
+class SignInWithEmail extends StatefulWidget {
+  const SignInWithEmail({super.key});
 
   @override
-  State<SignUpCreatePassword> createState() => _SignUpCreatePasswordState();
+  State<SignInWithEmail> createState() => _SignInWithEmailState();
 }
 
-class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
-  final TextEditingController _controller = TextEditingController();
+class _SignInWithEmailState extends State<SignInWithEmail> {
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerPassword = TextEditingController();
+
   bool _obscure = true;
-
-  bool get hasTyping => _controller.text.isNotEmpty;
-  bool get hasMinLength => _controller.text.length >= 8;
-  bool get hasNumber => RegExp(r'\d').hasMatch(_controller.text);
-  bool get hasSymbol =>
-      RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(_controller.text);
-
-  int get strength {
-    int value = 0;
-    if (hasTyping) value++;
-    if (hasMinLength) value++;
-    if (hasNumber) value += 2;
-    if (hasSymbol) value += 2;
-    return value;
-  }
-
-  Color get strengthColor {
-    switch (strength) {
-      case 1:
-        return AppColors.black4;
-      case 2:
-        return AppColors.redPrimary;
-      case 3:
-        return AppColors.yellow;
-      case 4:
-        return AppColors.yellow;
-      case 5:
-        return AppColors.yellow;
-      case 6:
-        return AppColors.green;
-      default:
-        return AppColors.gray500;
-    }
-  }
+  bool get hasTypingEmail => _controllerEmail.text.isNotEmpty;
+  bool get hasTypingPassword => _controllerEmail.text.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
-        spacing: 17,
         children: [
-          SizedBox(height: 30),
+          SizedBox(height: 32),
           Row(
             children: [
               BackButton(color: AppColors.black5),
               Text(
-                'Create your password',
+                'Log into account',
                 style: Theme.of(
                   context,
                 ).textTheme.headlineMedium?.copyWith(color: AppColors.black5),
               ),
             ],
           ),
-
-          stepIndicator(3),
-
+          SizedBox(height: 24),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(
@@ -81,16 +45,28 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 10,
                 children: [
+                  Text('Email', style: Theme.of(context).textTheme.bodyMedium),
+                  TextField(
+                    controller: _controllerEmail,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    decoration: InputDecoration(
+                      hintText: 'example@mail.com',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+
                   Text(
                     'Password',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 8),
 
                   /// Password field
                   TextField(
-                    controller: _controller,
+                    controller: _controllerPassword,
                     obscureText: _obscure,
                     onChanged: (_) => setState(() {}),
                     style: Theme.of(context).textTheme.bodySmall,
@@ -108,40 +84,37 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 5),
 
-                  /// Strength bar
-                  LinearProgressIndicator(
-                    value: strength / 6,
-                    minHeight: 6,
-                    backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation(strengthColor),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  RequirementItem('8 characters minimum', hasMinLength),
-                  RequirementItem('a number', hasNumber),
-                  RequirementItem('a symbol', hasSymbol),
-
-                  const SizedBox(height: 8),
-
+                  // Row(
+                  //   spacing: 2,
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   children: [
+                  //     Icon(Icons.error_outline, color: AppColors.redPrimary),
+                  //     Expanded(
+                  //       child: Text(
+                  //         'Oops! Email or password incorrect try another one.',
+                  //         style: Theme.of(context).textTheme.bodySmall
+                  //             ?.copyWith(color: AppColors.redPrimary),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: () {
-                        if (strength == 6) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpDone(),
-                            ),
-                          );
-                        }
+                        hasTypingEmail && hasTypingPassword
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignInWithEmail(),
+                                ),
+                              )
+                            : null;
                       },
                       style: FilledButton.styleFrom(
-                        backgroundColor: strength == 6
+                        backgroundColor: hasTypingEmail && hasTypingPassword
                             ? AppColors.violet400
                             : AppColors.violet200,
                         shape: RoundedRectangleBorder(
@@ -150,10 +123,22 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
                         padding: EdgeInsets.symmetric(vertical: 18),
                       ),
                       child: Text(
-                        'Continue',
+                        'Log in',
                         style: Theme.of(
                           context,
                         ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 5),
+
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Text(
+                        'Forgot Password?',
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
                   ),

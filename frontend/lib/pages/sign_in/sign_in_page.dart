@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
+import 'package:hackathon_app/pages/sign_in/sign_in_with_email.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_add_email.dart';
 
 class SignInPage extends StatefulWidget {
@@ -31,7 +32,12 @@ class _SignInPageState extends State<SignInPage> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(right: 16, left: 16, top: 10),
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                top: 10,
+                bottom: 32,
+              ),
               child: Column(
                 children: [
                   Column(
@@ -54,7 +60,7 @@ class _SignInPageState extends State<SignInPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignUpAddEmail(),
+                                builder: (context) => SignInWithEmail(),
                               ),
                             );
                           },
@@ -107,12 +113,10 @@ class _SignInPageState extends State<SignInPage> {
                     ],
                   ),
                   Spacer(),
-                  SafeArea(
-                    child: Text(
-                      'By using Neura, you agree to the \n Terms and Privacy Policy.',
-                      style: Theme.of(context).textTheme.labelSmall,
-                      textAlign: TextAlign.center,
-                    ),
+                  Text(
+                    'By using Neura, you agree to the \n Terms and Privacy Policy.',
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

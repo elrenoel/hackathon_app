@@ -35,7 +35,12 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(right: 16, left: 16, top: 20),
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                bottom: 32,
+                top: 20,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 spacing: 10,
@@ -87,12 +92,10 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                     ),
                   ),
                   Spacer(),
-                  SafeArea(
-                    child: Text(
-                      'By using Neura, you agree to the \n Terms and Privacy Policy.',
-                      style: Theme.of(context).textTheme.labelSmall,
-                      textAlign: TextAlign.center,
-                    ),
+                  Text(
+                    'By using Neura, you agree to the \n Terms and Privacy Policy.',
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

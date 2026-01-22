@@ -31,7 +31,12 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(right: 16, left: 16, top: 10),
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                top: 10,
+                bottom: 32,
+              ),
               child: Column(
                 children: [
                   Column(
@@ -107,12 +112,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ],
                   ),
                   Spacer(),
-                  SafeArea(
-                    child: Text(
-                      'By using Neura, you agree to the \n Terms and Privacy Policy.',
-                      style: Theme.of(context).textTheme.labelSmall,
-                      textAlign: TextAlign.center,
-                    ),
+                  Text(
+                    'By using Neura, you agree to the \n Terms and Privacy Policy.',
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
