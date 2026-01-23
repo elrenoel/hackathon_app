@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 
-Widget stepIndicator(int step) {
+Widget stepIndicator(int step, int countStep) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
-    children: List.generate(3, (index) {
+    children: List.generate(countStep, (index) {
       final isActive = step >= index + 1;
 
       return Padding(

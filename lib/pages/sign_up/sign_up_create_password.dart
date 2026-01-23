@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_done.dart';
 import 'package:hackathon_app/widgets/sign_up_widget/requirement_item.dart';
-import 'package:hackathon_app/widgets/sign_up_widget/step_indicator.dart';
+import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpCreatePassword extends StatefulWidget {
   const SignUpCreatePassword({super.key});
@@ -69,7 +69,7 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
             ],
           ),
 
-          stepIndicator(3),
+          stepIndicator(3, 3),
 
           Expanded(
             child: Padding(

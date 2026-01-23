@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_in/sign_in_with_email.dart';
-import 'package:hackathon_app/pages/sign_up/sign_up_add_email.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});

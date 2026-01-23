@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_add_email.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_create_password.dart';
-import 'package:hackathon_app/widgets/sign_up_widget/step_indicator.dart';
+import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpVerificationEmail extends StatefulWidget {
   const SignUpVerificationEmail({super.key});
@@ -57,7 +57,7 @@ class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
             ],
           ),
 
-          stepIndicator(2),
+          stepIndicator(2, 3),
 
           Expanded(
             child: Padding(
