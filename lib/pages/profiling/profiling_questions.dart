@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
+import 'package:hackathon_app/pages/profiling/profiling_calculate_result.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class Question {
@@ -79,9 +81,35 @@ class _ProfilingQuestionsState extends State<ProfilingQuestions> {
     if (currentIndex < questions.length - 1) {
       setState(() => currentIndex++);
     } else {
-      // selesai
-      debugPrint('Answers: $answers');
+      final result = answersUser();
+      debugPrint('Answers: $result}');
     }
+  }
+
+  void back() {
+    if (currentIndex > 0) {
+      setState(() => currentIndex--);
+    }
+  }
+
+  List<Map<String, dynamic>> answersUser() {
+    return List.generate(questions.length, (index) {
+      final selectedIndex = answers[index];
+
+      return {
+        'question': index + 1,
+        'answers': selectedIndex != null
+            ? questions[index].options[selectedIndex]
+            : null,
+      };
+    });
+  }
+
+  void finish() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilingCalculateResult()),
+    );
   }
 
   @override
@@ -89,60 +117,114 @@ class _ProfilingQuestionsState extends State<ProfilingQuestions> {
     final q = questions[currentIndex];
 
     return Scaffold(
-      appBar: AppBar(title: Text(q.title)),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            stepIndicator(currentIndex + 1, 5),
+      backgroundColor: Colors.white,
+      body: Column(
+        spacing: 17,
+        children: [
+          SizedBox(height: 30),
+          Row(
+            children: [
+              BackButton(color: AppColors.black5),
+              Text(
+                q.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(color: AppColors.black5),
+              ),
+            ],
+          ),
+          stepIndicator(currentIndex + 1, 5),
 
-            const SizedBox(height: 24),
-            Text(
-              q.question,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-
-            const SizedBox(height: 24),
-
-            ...List.generate(q.options.length, (i) {
-              final selected = answers[currentIndex] == i;
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: selected
-                          ? Colors.deepPurple
-                          : Colors.deepPurple.shade100,
-                      foregroundColor: selected
-                          ? Colors.white
-                          : Colors.deepPurple,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                bottom: 32,
+                top: 10,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    q.question,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
-                    onPressed: () {
-                      setState(() => answers[currentIndex] = i);
-                    },
-                    child: Text(q.options[i]),
                   ),
-                ),
-              );
-            }),
 
-            const Spacer(),
+                  const SizedBox(height: 24),
 
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: next,
-                child: Text(
-                  currentIndex == questions.length - 1 ? 'Finish' : 'Next',
-                ),
+                  ...List.generate(q.options.length, (i) {
+                    final selected = answers[currentIndex] == i;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: selected
+                                ? Colors.deepPurple
+                                : Colors.deepPurple.shade100,
+                            foregroundColor: selected
+                                ? Colors.white
+                                : Colors.deepPurple,
+                            padding: EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() => answers[currentIndex] = i);
+                          },
+                          child: Text(q.options[i]),
+                        ),
+                      ),
+                    );
+                  }),
+
+                  Spacer(),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      if (currentIndex > 0)
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: back,
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 18),
+                            ),
+                            child: Text('Back'),
+                          ),
+                        ),
+
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: currentIndex == questions.length - 1
+                              ? finish
+                              : next,
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 18),
+                          ),
+                          child: Text(
+                            currentIndex == questions.length - 1
+                                ? 'Finish'
+                                : 'Next',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

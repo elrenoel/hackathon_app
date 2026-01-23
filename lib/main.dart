@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hackathon_app/pages/profiling/profiling_begin.dart';
+import 'package:hackathon_app/pages/profiling/profiling_calculate_result.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const ProfilingBegin(),
+      home: ProfilingCalculateResult(),
     );
   }
 }

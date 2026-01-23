@@ -30,7 +30,7 @@ class RecomendationTask extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Short sessions Deep Read (7–10 minutes) & Based on your mood & schedule',
-                  style: Theme.of(context).textTheme.displayMedium,
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
               ),
               IconButton(

@@ -23,9 +23,13 @@ class _GoalsTodayState extends State<GoalsToday> {
               children: [
                 Text(
                   'What do you want to get done today?',
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                Text('for good focus max 3–5 item todo list today'),
+
+                Text(
+                  'for good focus max 3–5 item todo list today',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
               ],
             ),
             IconButton(
