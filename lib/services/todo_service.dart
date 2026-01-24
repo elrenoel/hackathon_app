@@ -53,4 +53,43 @@ class TodoService {
 
     return response.statusCode == 200 || response.statusCode == 201;
   }
+
+  static Future<bool> toggleTodo(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("access_token");
+
+    if (token == null) {
+      print("❌ TOKEN NULL");
+      return false;
+    }
+
+    final response = await http.patch(
+      Uri.parse("$baseUrl/todos/todos/$id"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    // print("🟡 TOGGLE TODO ID: $id");
+    // print("🟢 STATUS CODE: ${response.statusCode}");
+    // print("🟢 BODY: ${response.body}");
+
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> deleteTodo(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("access_token");
+
+    if (token == null) return false;
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/todos/todos/$id"),
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    print('🗑️ DELETE STATUS: ${response.statusCode}');
+    return response.statusCode == 204;
+  }
 }
