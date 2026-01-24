@@ -46,6 +46,15 @@ class _GoalsTodayState extends State<GoalsToday> {
     });
   }
 
+  int get totalTodos => goals.length;
+
+  int get doneTodos => goals.where((t) => t.goalsDone).length;
+
+  double get progress {
+    if (totalTodos == 0) return 0;
+    return doneTodos / totalTodos;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -88,6 +97,35 @@ class _GoalsTodayState extends State<GoalsToday> {
         ),
 
         const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Progress Today',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+
+              const SizedBox(height: 6),
+
+              LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(8),
+                backgroundColor: Colors.grey.shade300,
+                valueColor: const AlwaysStoppedAnimation(Colors.black),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                '$doneTodos / $totalTodos goals done',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
+        ),
 
         // ===== LIST TODO =====
         if (_loading)
