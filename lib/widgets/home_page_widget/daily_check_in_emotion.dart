@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/widgets/emotion_btn.dart';
 
 class DailyCheckInEmotion extends StatefulWidget {
@@ -14,9 +15,9 @@ class _DailyCheckInEmotionState extends State<DailyCheckInEmotion> {
   void toggleEmotion(String emotion) {
     setState(() {
       if (selectedEmotion == emotion) {
-        selectedEmotion = null; // tekan 2x → mati
+        selectedEmotion = null;
       } else {
-        selectedEmotion = emotion; // pilih baru
+        selectedEmotion = emotion;
       }
     });
   }
@@ -26,47 +27,80 @@ class _DailyCheckInEmotionState extends State<DailyCheckInEmotion> {
     return Column(
       children: [
         Text(
-          "How have things been today?",
-          style: Theme.of(context).textTheme.headlineLarge,
+          "How are you feeling today?",
+          style: Theme.of(context).textTheme.headlineSmall,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 10),
 
         // Emotion Buttons
         Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 12,
+          spacing: 5,
           runSpacing: 12,
+          alignment: WrapAlignment.center,
           children: [
             emotionButton(
-              text: 'Happy',
-              color: Colors.lightGreenAccent,
-              isSelected: selectedEmotion == 'Happy',
-              onPressed: () => toggleEmotion('Happy'),
+              assetPath: 'assets/icons/mood2.png',
+              isSelected: selectedEmotion == 'Calm',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Calm';
+                });
+              },
             ),
             emotionButton(
-              text: 'Angry',
-              color: Colors.redAccent,
-              isSelected: selectedEmotion == 'Angry',
-              onPressed: () => toggleEmotion('Angry'),
-            ),
-            emotionButton(
-              text: 'Excited',
-              color: Colors.purpleAccent,
-              isSelected: selectedEmotion == 'Excited',
-              onPressed: () => toggleEmotion('Excited'),
-            ),
-            emotionButton(
-              text: 'Stressed',
-              color: Colors.orangeAccent,
-              isSelected: selectedEmotion == 'Stressed',
-              onPressed: () => toggleEmotion('Stressed'),
-            ),
-            emotionButton(
-              text: 'Sad',
-              color: Colors.blueAccent,
+              assetPath: 'assets/icons/mood3.png',
               isSelected: selectedEmotion == 'Sad',
-              onPressed: () => toggleEmotion('Sad'),
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Sad';
+                });
+              },
+            ),
+            emotionButton(
+              assetPath: 'assets/icons/mood4.png',
+              isSelected: selectedEmotion == 'Angry',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Angry';
+                });
+              },
+            ),
+            emotionButton(
+              assetPath: 'assets/icons/mood7.png',
+              isSelected: selectedEmotion == 'Happy',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Happy';
+                });
+              },
+            ),
+            emotionButton(
+              assetPath: 'assets/icons/mood5.png',
+              isSelected: selectedEmotion == 'Tired',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Tired';
+                });
+              },
+            ),
+            emotionButton(
+              assetPath: 'assets/icons/mood6.png',
+              isSelected: selectedEmotion == 'Stress',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Stress';
+                });
+              },
+            ),
+            emotionButton(
+              assetPath: 'assets/icons/mood1.png',
+              isSelected: selectedEmotion == 'Badmood',
+              onPressed: () {
+                setState(() {
+                  selectedEmotion = 'Badmood';
+                });
+              },
             ),
           ],
         ),
@@ -80,17 +114,20 @@ class _DailyCheckInEmotionState extends State<DailyCheckInEmotion> {
             debugPrint('Button ditekan');
           },
           style: TextButton.styleFrom(
-            backgroundColor: Colors.black,
+            backgroundColor: AppColors.violet300,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
             padding: EdgeInsets.symmetric(horizontal: 100),
           ),
-          child: Text(
-            'Submit',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Text(
+              'Submit',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.white),
+            ),
           ),
         ),
 
