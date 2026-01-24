@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
+import 'package:hackathon_app/services/auth_service.dart';
+import 'package:hackathon_app/pages/home_page.dart';
 
 class SignInWithEmail extends StatefulWidget {
   const SignInWithEmail({super.key});
@@ -13,8 +15,31 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
   final TextEditingController _controllerPassword = TextEditingController();
 
   bool _obscure = true;
+  bool _loading = false;
   bool get hasTypingEmail => _controllerEmail.text.isNotEmpty;
   bool get hasTypingPassword => _controllerEmail.text.isNotEmpty;
+
+  Future<void> _handleLogin() async {
+    setState(() => _loading = true);
+    final success = await AuthService.login(
+      _controllerEmail.text.trim(),
+      _controllerPassword.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    setState(() => _loading = false);
+    if (success && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email atau password salah")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,16 +128,10 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {
-                        hasTypingEmail && hasTypingPassword
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SignInWithEmail(),
-                                ),
-                              )
-                            : null;
-                      },
+                      onPressed:
+                          hasTypingEmail && hasTypingPassword && !_loading
+                          ? _handleLogin
+                          : null,
                       style: FilledButton.styleFrom(
                         backgroundColor: hasTypingEmail && hasTypingPassword
                             ? AppColors.violet400

@@ -3,6 +3,7 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
+    name: str
 
 class UserCreate(UserBase):
     password: str = Field(min_length=6)
@@ -15,10 +16,12 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
-
+    email: EmailStr
+    name: str
     class Config:
         from_attributes = True
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+

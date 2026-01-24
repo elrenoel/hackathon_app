@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-
+from sqlalchemy.exc import IntegrityError
 # from routers import database, schemas, models, utils, oauth2
-import database
-import schemas
-import models
-import utils
-import oauth2
+from app import database
+from app import schemas
+from app import models
+from app import utils
+from app import oauth2
 
 
 router = APIRouter(
@@ -24,13 +24,30 @@ def register(
 
     new_user = models.User(
         email=user.email,
-        password=hashed_pw
+        password=hashed_pw,
+        name= user.name
+    )
+    existing_name = db.query(models.User).filter(
+        models.User.name == user.name).first()
+
+    if existing_name:
+        raise HTTPException(
+            status_code=400,
+            detail="Name already taken"
     )
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return new_user
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email sudah terdaftar"
+        )
 
 @router.post("/login", response_model=schemas.Token)
 def login(

@@ -5,7 +5,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-import database, models
+from app import database, models
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 

@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 # from routers import todo
-from routers import auth
-from database import Base, engine
-import models
-import oauth2
+from app.routers import auth
+from app.database import Base, engine
+from app import models
+from app import oauth2
+from app import schemas
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,10 +28,14 @@ app.include_router(auth.router)
 def root():
     return {"message": "API is running 🚀"}
 
-@app.get("/protected")
+# @app.get("/protected")
+# def protected_route(current_user = Depends(oauth2.get_current_user)):
+#     return {
+#         "message": "You are authorized",
+#         "id": current_user.id,
+#         "name":current_user.name,
+#         "email": current_user.email,
+#     }
+@app.get("/protected", response_model=schemas.UserResponse)
 def protected_route(current_user = Depends(oauth2.get_current_user)):
-    return {
-        "message": "You are authorized",
-        "user_id": current_user.id,
-        "email": current_user.email
-    }
+    return current_user
