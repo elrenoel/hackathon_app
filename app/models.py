@@ -1,11 +1,27 @@
-from sqlalchemy import Column, Integer,String, Boolean
-from sqlalchemy.sql.expression import null,text
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from app.database import Base
-from sqlalchemy.sql.sqltypes import TIMESTAMP
-# models.py
+
 class User(Base):
     __tablename__ = "users"
+
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    name = Column(String, unique=True, nullable=False) 
+    name = Column(String, unique=True, nullable=False)
+
+    todos = relationship("Todo", back_populates="owner")
+
+
+class Todo(Base):
+    __tablename__ = "todos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    duration = Column(String, nullable=True)
+    start_time = Column(String, nullable=True)
+    reminder = Column(String, nullable=True)
+    is_done = Column(Boolean, default=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", back_populates="todos")

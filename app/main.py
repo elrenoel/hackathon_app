@@ -6,6 +6,7 @@ from app.database import Base, engine
 from app import models
 from app import oauth2
 from app import schemas
+from app.routers import todo
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -23,6 +24,8 @@ app.add_middleware(
 #venv\Scripts\activate
 # app.include_router(todo.router)
 app.include_router(auth.router)
+app.include_router(todo.router)
+
 
 @app.get("/")
 def root():

@@ -1,71 +1,47 @@
 import 'package:flutter/material.dart';
 
 class StartTimeTask extends StatelessWidget {
-  final TextEditingController controller;
+  final DateTime? selectedTime;
+  final ValueChanged<DateTime> onChanged;
 
-  const StartTimeTask({super.key, required this.controller});
+  const StartTimeTask({super.key, this.selectedTime, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
+    final displayText = selectedTime == null
+        ? ''
+        : '${selectedTime!.hour.toString().padLeft(2, '0')}:'
+              '${selectedTime!.minute.toString().padLeft(2, '0')}';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Start Time'),
-        SizedBox(height: 10),
+        const Text('Start Time'),
+        const SizedBox(height: 10),
         TextField(
           readOnly: true,
-          controller: controller,
+          controller: TextEditingController(text: displayText),
           onTap: () async {
             final time = await showTimePicker(
               context: context,
               initialTime: TimeOfDay.now(),
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    timePickerTheme: TimePickerThemeData(
-                      backgroundColor: Color(0xFFF5F5F5),
-
-                      // Jam & menit (kotak besar)
-                      hourMinuteColor: Colors.white,
-                      hourMinuteTextColor: Colors.black,
-                      hourMinuteShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-
-                      // AM / PM
-                      dayPeriodColor: Colors.white,
-                      dayPeriodTextColor: Colors.black,
-                      dayPeriodShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-
-                      // Dial (jam bulat)
-                      dialBackgroundColor: Colors.white,
-                      dialHandColor: Colors.grey,
-                      dialTextColor: Colors.black,
-
-                      // Tombol OK / Cancel
-                      cancelButtonStyle: TextButton.styleFrom(
-                        foregroundColor: Colors.grey,
-                      ),
-                      confirmButtonStyle: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                    ),
-                  ),
-                  child: child!,
-                );
-              },
             );
 
             if (time != null) {
-              controller.text =
-                  '${time.hour.toString().padLeft(2, '0')}:'
-                  '${time.minute.toString().padLeft(2, '0')}:00';
+              final now = DateTime.now();
+              final pickedDateTime = DateTime(
+                now.year,
+                now.month,
+                now.day,
+                time.hour,
+                time.minute,
+              );
+
+              onChanged(pickedDateTime); // 🔥 KIRIM DATETIME
             }
           },
           decoration: const InputDecoration(
-            hintText: 'hh:mm:ss',
+            hintText: 'hh:mm',
             border: OutlineInputBorder(),
           ),
         ),

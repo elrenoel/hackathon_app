@@ -1,4 +1,5 @@
-import 'dart:convert';
+// import 'dart:convert';
+import 'package:hackathon_app/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/widgets/input_new_goal_widget/duration_time_task.dart';
 import 'package:hackathon_app/widgets/input_new_goal_widget/field_task_title.dart';
@@ -9,7 +10,7 @@ import 'package:hackathon_app/widgets/input_new_goal_widget/sub_task_section.dar
 class Task {
   final String title;
   final String durationTime;
-  final String startTime;
+  final DateTime startTime;
   final List<SubTask> subTasks;
   final String reminder;
   final bool goalsDone;
@@ -44,7 +45,8 @@ class _InputGoalPageState extends State<InputGoalPage> {
   String valueTaskTitle = '';
   int? valueDurationHours;
   int? valueDurationMinutes;
-  final TextEditingController startTimeController = TextEditingController();
+  // final TextEditingController startTimeController = TextEditingController();
+  DateTime? _startTime;
   String? valueReminder;
   List<SubTask> subTasks = [];
   List<Map<String, dynamic>> tasks = [];
@@ -70,34 +72,45 @@ class _InputGoalPageState extends State<InputGoalPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           child: ElevatedButton(
-            onPressed: () {
-              final task = Task(
+            onPressed: () async {
+              if (valueTaskTitle.isEmpty) return;
+
+              final duration =
+                  '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min';
+
+              final success = await TodoService.addTodo(
                 title: valueTaskTitle,
-                durationTime:
-                    '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min',
-                startTime: startTimeController.text,
-                subTasks: subTasks,
-                reminder: valueReminder ?? '',
-                goalsDone: goalsDone,
+                duration: duration,
+                startTime: _startTime ?? DateTime.now(),
+                reminder: valueReminder,
               );
 
-              Navigator.pop(context, task);
+              if (!mounted) return;
 
-              setState(() {
-                tasks.add({
-                  'title': valueTaskTitle,
-                  'durationTime':
-                      '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min',
-                  'starTime': startTimeController.text,
-                  'subTasks': subTasks.map((s) => s.toJson()).toList(),
-                  'reminder': valueReminder,
-                  'goalsDone': goalsDone,
-                });
-
-                // ignore: avoid_print
-                print(const JsonEncoder.withIndent('  ').convert(tasks));
-              });
+              if (success) {
+                Navigator.pop(context, true); // ⬅️ PENTING
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Gagal menyimpan todo")),
+                );
+              }
             },
+
+            //   setState(() {
+            //     tasks.add({
+            //       'title': valueTaskTitle,
+            //       'durationTime':
+            //           '${valueDurationHours ?? 0} hr : ${valueDurationMinutes ?? 0} min',
+            //       'startTime': (_startTime ?? DateTime.now()).toIso8601String(),
+            //       'subTasks': subTasks.map((s) => s.toJson()).toList(),
+            //       'reminder': valueReminder,
+            //       'goalsDone': goalsDone,
+            //     });
+
+            //     // ignore: avoid_print
+            //     print(const JsonEncoder.withIndent('  ').convert(tasks));
+            //   });
+            // },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
             child: Text(
               'Submit',
@@ -164,7 +177,14 @@ class _InputGoalPageState extends State<InputGoalPage> {
 
             SizedBox(height: 10),
 
-            StartTimeTask(controller: startTimeController),
+            StartTimeTask(
+              selectedTime: _startTime,
+              onChanged: (value) {
+                setState(() {
+                  _startTime = value;
+                });
+              },
+            ),
 
             SizedBox(height: 10),
 

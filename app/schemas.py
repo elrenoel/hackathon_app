@@ -25,3 +25,20 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class TodoCreate(BaseModel):
+    title: str
+    duration: str | None = None
+    start_time: str | None = None
+    reminder: str | None = None
+
+
+class TodoResponse(BaseModel):
+    id: int
+    title: str
+    duration: str | None
+    start_time: str | None
+    reminder: str | None
+    is_done: bool
+
+    class Config:
+        from_attributes = True
