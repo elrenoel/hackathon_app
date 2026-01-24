@@ -8,6 +8,7 @@ import 'package:hackathon_app/widgets/input_new_goal_widget/start_time_task.dart
 import 'package:hackathon_app/widgets/input_new_goal_widget/sub_task_section.dart';
 
 class Task {
+  final int id;
   final String title;
   final String durationTime;
   final DateTime startTime;
@@ -16,6 +17,7 @@ class Task {
   final bool goalsDone;
 
   Task({
+    required this.id,
     required this.title,
     required this.durationTime,
     required this.startTime,

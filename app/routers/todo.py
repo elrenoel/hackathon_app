@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,HTTPException
 from sqlalchemy.orm import Session
 
 from app import models
@@ -35,3 +35,48 @@ def get_my_todos(
     return db.query(models.Todo)\
         .filter(models.Todo.user_id == current_user.id)\
         .all()
+
+@router.patch("/todos/{todo_id}", response_model=schemas.TodoResponse)
+def toggle_todo_done(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(oauth2.get_current_user),
+):
+    todo = (
+        db.query(models.Todo)
+        .filter(
+            models.Todo.id == todo_id,
+            models.Todo.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    todo.is_done = not todo.is_done
+    db.commit()
+    db.refresh(todo)
+
+    return todo
+
+@router.delete("/todos/{todo_id}", status_code=204)
+def delete_todo(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(oauth2.get_current_user),
+):
+    todo = (
+        db.query(models.Todo)
+        .filter(
+            models.Todo.id == todo_id,
+            models.Todo.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    db.delete(todo)
+    db.commit()
