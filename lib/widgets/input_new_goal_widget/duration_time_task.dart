@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
 
 class DurationTimeTask extends StatefulWidget {
   final ValueChanged<int>? onChangedHours;
@@ -23,9 +24,9 @@ class _DurationTimeTaskState extends State<DurationTimeTask> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Durasi Waktu',
-          style: TextStyle(fontWeight: FontWeight.w600),
+        Text(
+          'Duration Time',
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 14),
         Row(
@@ -34,10 +35,15 @@ class _DurationTimeTaskState extends State<DurationTimeTask> {
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: valueHours,
-                decoration: const InputDecoration(
+                menuMaxHeight: 240,
+                decoration: InputDecoration(
                   labelText: 'Hours',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.violet300),
+                  ),
                 ),
+                style: Theme.of(context).textTheme.labelSmall,
                 items: List.generate(25, (index) {
                   return DropdownMenuItem<int>(
                     value: index,
@@ -61,10 +67,15 @@ class _DurationTimeTaskState extends State<DurationTimeTask> {
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: valueMinutes,
-                decoration: const InputDecoration(
+                menuMaxHeight: 240,
+                decoration: InputDecoration(
                   labelText: 'Minutes',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.violet300),
+                  ),
                 ),
+                style: Theme.of(context).textTheme.labelSmall,
                 items: List.generate(61, (index) {
                   return DropdownMenuItem(value: index, child: Text('$index'));
                 }),

@@ -71,7 +71,6 @@ class _GoalsTodayState extends State<GoalsToday> {
                 ),
               ),
 
-              // ===== ADD TODO =====
               IconButton(
                 onPressed: () async {
                   final result = await Navigator.push<bool>(
@@ -92,7 +91,6 @@ class _GoalsTodayState extends State<GoalsToday> {
 
           const SizedBox(height: 10),
 
-          // ===== LIST TODO =====
           if (_loading)
             const Padding(
               padding: EdgeInsets.all(16),
@@ -161,111 +159,102 @@ class _GoalsTodayState extends State<GoalsToday> {
                 );
               },
             ),
-<<<<<<< HEAD
-        ],
-      ),
-=======
-          ],
-        ),
+          const SizedBox(height: 10),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: CircularProgressIndicator(),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: goals.length,
+              itemBuilder: (context, index) {
+                final task = goals[index];
 
-        const SizedBox(height: 10),
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: Text(task.title)),
+                        Expanded(child: Text(task.durationTime)),
 
-        // ===== LIST TODO =====
-        if (_loading)
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: CircularProgressIndicator(),
-          )
-        else
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: goals.length,
-            itemBuilder: (context, index) {
-              final task = goals[index];
-
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(child: Text(task.title)),
-                      Expanded(child: Text(task.durationTime)),
-
-                      Row(
-                        children: [
-                          // 🗑️ DELETE
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: const Text("Delete todo?"),
-                                  content: const Text(
-                                    "This action cannot be undone",
+                        Row(
+                          children: [
+                            // 🗑️ DELETE
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text("Delete todo?"),
+                                    content: const Text(
+                                      "This action cannot be undone",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: const Text("Delete"),
+                                      ),
+                                    ],
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text("Cancel"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: const Text("Delete"),
-                                    ),
-                                  ],
-                                ),
-                              );
+                                );
 
-                              if (confirm == true) {
-                                final success = await TodoService.deleteTodo(
+                                if (confirm == true) {
+                                  final success = await TodoService.deleteTodo(
+                                    task.id,
+                                  );
+                                  if (success) _loadGoals();
+                                }
+                              },
+                            ),
+                            // ✅ TOGGLE DONE / FOCUS
+                            InkWell(
+                              onTap: () async {
+                                print('CLICKED TODO ID: ${task.id}');
+                                final success = await TodoService.toggleTodo(
                                   task.id,
                                 );
-                                if (success) _loadGoals();
-                              }
-                            },
-                          ),
-                          // ✅ TOGGLE DONE / FOCUS
-                          InkWell(
-                            onTap: () async {
-                              print('CLICKED TODO ID: ${task.id}');
-                              final success = await TodoService.toggleTodo(
-                                task.id,
-                              );
-                              if (success) {
-                                _loadGoals();
-                              }
-                            },
-                            child: Row(
-                              children: [
-                                Text(task.goalsDone ? 'Done' : 'Focus Now'),
-                                const SizedBox(width: 6),
-                                Icon(
-                                  task.goalsDone
-                                      ? Icons.check_circle
-                                      : Icons.arrow_forward_ios,
-                                  size: 16,
-                                  color: task.goalsDone
-                                      ? Colors.green
-                                      : Colors.black,
-                                ),
-                              ],
+                                if (success) {
+                                  _loadGoals();
+                                }
+                              },
+                              child: Row(
+                                children: [
+                                  Text(task.goalsDone ? 'Done' : 'Focus Now'),
+                                  const SizedBox(width: 6),
+                                  Icon(
+                                    task.goalsDone
+                                        ? Icons.check_circle
+                                        : Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: task.goalsDone
+                                        ? Colors.green
+                                        : Colors.black,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-      ],
->>>>>>> a9f624570b6d7a54de34e41432aabee3ac83db34
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 }
