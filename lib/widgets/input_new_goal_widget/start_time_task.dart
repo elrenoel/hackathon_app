@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart' show AppColors;
 
 class StartTimeTask extends StatelessWidget {
   final DateTime? selectedTime;
@@ -16,7 +17,7 @@ class StartTimeTask extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Start Time'),
+        Text('Start Time', style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 10),
         TextField(
           readOnly: true,
@@ -37,13 +38,17 @@ class StartTimeTask extends StatelessWidget {
                 time.minute,
               );
 
-              onChanged(pickedDateTime); // 🔥 KIRIM DATETIME
+              onChanged(pickedDateTime);
             }
           },
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'hh:mm',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.violet300),
+            ),
           ),
+          style: Theme.of(context).textTheme.labelSmall,
         ),
       ],
     );

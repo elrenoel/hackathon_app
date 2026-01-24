@@ -18,43 +18,62 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  void register() async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    setState(() => _loading = true);
+
+    final error = await AuthService.register(
+      _nameController.text.trim(),
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    setState(() => _loading = false);
+
+    if (error == null) {
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
+      );
+    } else {
+      messenger.showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
+
   bool _loading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        spacing: 17,
-        children: [
-          SizedBox(height: 30),
-          Row(
-            children: [
-              BackButton(color: AppColors.black5),
-              Text(
-                'Add your email',
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineMedium?.copyWith(color: AppColors.black5),
-              ),
-            ],
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Row(
+              children: [
+                BackButton(color: AppColors.black5),
+                Text(
+                  'Add your email',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(color: AppColors.black5),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
 
-          stepIndicator(1, 3),
+            stepIndicator(1, 3),
+            SizedBox(height: 20),
 
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 16,
-                left: 16,
-                bottom: 32,
-                top: 20,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 10,
-                children: [
-                  Column(
-                    spacing: 10,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Full Name'),
@@ -68,6 +87,8 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                         ),
                       ),
 
+                      SizedBox(height: 10),
+
                       Text('Email'),
                       TextField(
                         controller: _emailController,
@@ -78,6 +99,8 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                           ),
                         ),
                       ),
+
+                      SizedBox(height: 10),
 
                       Text('Password'),
                       TextField(
@@ -90,71 +113,42 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                           ),
                         ),
                       ),
+
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _loading ? null : register,
+
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.violet400,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 18),
+                          ),
+                          child: Text(
+                            'Create an account',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-
-                  SizedBox(height: 5),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _loading
-                          ? null
-                          : () async {
-                              final navigator = Navigator.of(context);
-                              final messenger = ScaffoldMessenger.of(context);
-
-                              setState(() => _loading = true);
-
-                              final error = await AuthService.register(
-                                _nameController.text.trim(),
-                                _emailController.text.trim(),
-                                _passwordController.text.trim(),
-                              );
-
-                              if (!mounted) return;
-
-                              setState(() => _loading = false);
-
-                              if (error == null) {
-                                navigator.pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (_) => const HomePage(),
-                                  ),
-                                  (route) => false,
-                                );
-                              } else {
-                                messenger.showSnackBar(
-                                  SnackBar(content: Text(error)),
-                                );
-                              }
-                            },
-
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.violet400,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                      ),
-                      child: Text(
-                        'Create an account',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    'By using Neura, you agree to the \n Terms and Privacy Policy.',
-                    style: Theme.of(context).textTheme.labelSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 32.0),
+              child: Text(
+                'By using Neura, you agree to the \n Terms and Privacy Policy.',
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

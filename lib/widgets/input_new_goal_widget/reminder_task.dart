@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
 
 class ReminderTask extends StatefulWidget {
   final ValueChanged<String>? onChangedReminder;
@@ -17,12 +18,17 @@ class _ReminderTaskState extends State<ReminderTask> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Reminder'),
+        Text('Reminder', style: Theme.of(context).textTheme.headlineMedium),
         SizedBox(height: 10),
 
         DropdownButtonFormField<String>(
           initialValue: valueReminder,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.violet300),
+            ),
+          ),
           items: [
             DropdownMenuItem(
               value: 'noReminder',
@@ -38,6 +44,7 @@ class _ReminderTaskState extends State<ReminderTask> {
             });
             widget.onChangedReminder?.call(value!);
           },
+          style: Theme.of(context).textTheme.labelSmall,
         ),
       ],
     );

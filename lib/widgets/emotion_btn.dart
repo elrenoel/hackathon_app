@@ -1,36 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 Widget emotionButton({
-  required String text,
-  required Color color,
+  required String assetPath,
   required bool isSelected,
   required VoidCallback onPressed,
+  double size = 32,
 }) {
-  return ElevatedButton(
-    onPressed: onPressed,
-    style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith((states) {
-        if (isSelected) {
-          return color; // warna selected
-        }
+  return InkWell(
+    onTap: onPressed,
+    borderRadius: BorderRadius.circular(999),
+    child: Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
         // ignore: deprecated_member_use
-        return color.withOpacity(0.35); // normal
-      }),
-      // ignore: deprecated_member_use
-      overlayColor: WidgetStateProperty.all(Colors.black.withOpacity(0.1)),
-      foregroundColor: WidgetStateProperty.all(Colors.black),
-      shape: WidgetStateProperty.all(const StadiumBorder()),
-      padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        color: isSelected ? Colors.black.withOpacity(0.2) : Colors.transparent,
       ),
-      elevation: WidgetStateProperty.all(0),
-    ),
-    child: Text(
-      text,
-      style: GoogleFonts.instrumentSans(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
+      child: Image.asset(
+        assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
       ),
     ),
   );

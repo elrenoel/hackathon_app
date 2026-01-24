@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hackathon_app/main_app.dart';
 // import 'package:hackathon_app/pages/profiling/profiling_begin.dart';
-import 'package:hackathon_app/pages/welcome_page.dart';
+// import 'package:hackathon_app/pages/welcome_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,14 +34,17 @@ class MyApp extends StatelessWidget {
             textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
           ),
           labelMedium: GoogleFonts.roboto(
-            textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           labelSmall: GoogleFonts.roboto(
             textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
           ),
         ),
       ),
-      home: const WelcomePage(),
+      home: const MainApp(),
     );
   }
 }

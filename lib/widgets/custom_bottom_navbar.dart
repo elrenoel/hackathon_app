@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -12,67 +13,128 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 4),
-            blurRadius: 20,
-            spreadRadius: 2,
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.15),
+    return SizedBox(
+      height: 90,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          // Background navbar
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: AppColors.violet100,
+                boxShadow: [
+                  BoxShadow(
+                    // ignore: deprecated_member_use
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _navItem(
+                      icon: 'assets/icons/home.png',
+                      label: 'Home',
+                      isActive: currentIndex == 0,
+                      onTap: () => onTap(0),
+                    ),
+
+                    _navItem(
+                      icon: 'assets/icons/deepRead.png',
+                      label: 'Deep Read',
+                      isActive: currentIndex == 1,
+                      onTap: () => onTap(1),
+                    ),
+
+                    const SizedBox(width: 40), // space buat tombol tengah
+
+                    _navItem(
+                      icon: 'assets/icons/map.png',
+                      label: 'Performance',
+                      isActive: currentIndex == 2,
+                      onTap: () => onTap(2),
+                    ),
+
+                    _navItem(
+                      icon: 'assets/icons/profile.png',
+                      label: 'Profile',
+                      isActive: currentIndex == 3,
+                      onTap: () => onTap(3),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: onTap,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        elevation: 0, // shadow kita handle sendiri
-        selectedItemColor: const Color(0xFF000000),
-        unselectedItemColor: const Color(0xFF777777),
-        showUnselectedLabels: true,
-        items: [
-          _navItem(
-            icon: 'assets/icons/home.png',
-            label: 'Home',
-            isActive: currentIndex == 0,
-          ),
-          _navItem(
-            icon: 'assets/icons/deep_read.png',
-            label: 'Deep Read',
-            isActive: currentIndex == 1,
-          ),
-          _navItem(
-            icon: 'assets/icons/map.png',
-            label: 'Map',
-            isActive: currentIndex == 2,
-          ),
-          _navItem(
-            icon: 'assets/icons/profile.png',
-            label: 'Profile',
-            isActive: currentIndex == 3,
+
+          // Tombol tengah (Play)
+          Positioned(
+            top: 30,
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.violet500,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      // ignore: deprecated_member_use
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  BottomNavigationBarItem _navItem({
+  Widget _navItem({
     required String icon,
     required String label,
     required bool isActive,
+    required VoidCallback onTap,
   }) {
-    return BottomNavigationBarItem(
-      label: label,
-      icon: Image.asset(
-        icon,
-        width: 24,
-        height: 24,
-        color: isActive ? const Color(0xFF000000) : const Color(0xFF777777),
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            icon,
+            width: 24,
+            height: 24,
+            color: isActive ? AppColors.violet500 : AppColors.violet300,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? AppColors.violet500 : AppColors.violet300,
+            ),
+          ),
+        ],
       ),
     );
   }

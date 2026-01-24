@@ -1,4 +1,5 @@
 // import 'dart:convert';
+import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/services/todo_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/widgets/input_new_goal_widget/duration_time_task.dart';
@@ -57,6 +58,7 @@ class _InputGoalPageState extends State<InputGoalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       bottomNavigationBar: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -113,9 +115,15 @@ class _InputGoalPageState extends State<InputGoalPage> {
             //     print(const JsonEncoder.withIndent('  ').convert(tasks));
             //   });
             // },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.violet300,
+              padding: EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(12),
+              ),
+            ),
             child: Text(
-              'Submit',
+              'Add New Goal',
               style: Theme.of(
                 context,
               ).textTheme.labelMedium?.copyWith(color: Colors.white),
@@ -123,87 +131,78 @@ class _InputGoalPageState extends State<InputGoalPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
-        child: Column(
-          children: [
-            // Header
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: Colors.black.withOpacity(0.15),
-                        offset: const Offset(0, 2), // y = 2
-                        blurRadius: 6,
-                      ),
-                    ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // ⬅️ PENTING
+            children: [
+              // ===== HEADER =====
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          // ignore: deprecated_member_use
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Image.asset('assets/icons/backbtn.png'),
+                    ),
                   ),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Image.asset('assets/icons/backbtn.png'),
+                  const SizedBox(width: 12),
+                  Text(
+                    'New Goal',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  'New Goal',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-            FieldTaskTitle(
-              onChanged: (value) {
-                valueTaskTitle = value;
-              },
-            ),
+              // ===== TASK TITLE =====
+              FieldTaskTitle(onChanged: (value) => valueTaskTitle = value),
 
-            SizedBox(height: 10),
+              const SizedBox(height: 16),
 
-            DurationTimeTask(
-              onChangedHours: (value) {
-                valueDurationHours = value;
-              },
-              onChangedMinutes: (value) {
-                valueDurationMinutes = value;
-              },
-            ),
+              // ===== DURATION =====
+              DurationTimeTask(
+                onChangedHours: (value) => valueDurationHours = value,
+                onChangedMinutes: (value) => valueDurationMinutes = value,
+              ),
 
-            SizedBox(height: 10),
+              const SizedBox(height: 16),
 
-            StartTimeTask(
-              selectedTime: _startTime,
-              onChanged: (value) {
-                setState(() {
-                  _startTime = value;
-                });
-              },
-            ),
+              // ===== START TIME =====
+              StartTimeTask(
+                selectedTime: _startTime,
+                onChanged: (value) {
+                  setState(() {
+                    _startTime = value;
+                  });
+                },
+              ),
 
-            SizedBox(height: 10),
+              const SizedBox(height: 16),
 
-            ReminderTask(
-              onChangedReminder: (value) {
-                valueReminder = value;
-              },
-            ),
+              // ===== REMINDER =====
+              ReminderTask(onChangedReminder: (value) => valueReminder = value),
 
-            SizedBox(height: 10),
+              const SizedBox(height: 20),
 
-            SubTaskSection(
-              onChanged: (List<SubTask> value) {
-                subTasks = value;
-              },
-            ),
-          ],
+              // ===== SUBTASK =====
+              SubTaskSection(onChanged: (value) => subTasks = value),
+            ],
+          ),
         ),
       ),
     );

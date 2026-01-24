@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/widgets/home_page_widget/daily_check_in_emotion.dart';
 import 'package:hackathon_app/widgets/home_page_widget/goals_today.dart';
 import 'package:hackathon_app/widgets/home_page_widget/recomendation_task.dart';
@@ -51,77 +52,91 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: _logout,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(1, 1),
-                        blurRadius: 3,
-                        color: Colors.black.withValues(alpha: 0.15),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: _logout,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(1, 1),
+                          blurRadius: 3,
+                          color: Colors.black.withValues(alpha: 0.15),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: Image.asset(
+                        'assets/icons/bro.jpg',
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: Image.asset(
-                      'assets/icons/bro.jpg',
-                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(width: 10),
-              Text(
-                _loadingUser ? "Loading..." : "Hi ${_user?['name'] ?? 'User'}!",
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  "☀️ Good Morning",
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      // Daily Check in Emotion/Mood
-                      DailyCheckInEmotion(),
-
-                      //End Daily Check in Emotion/Mood
-                      SizedBox(height: 15),
-
-                      // List Todo Today
-                      GoalsToday(),
-
-                      // End List Todo today
-                      SizedBox(height: 15),
-
-                      RecomendationTask(),
-                    ],
-                  ),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 2,
+                  children: [
+                    Text(
+                      _loadingUser
+                          ? "Loading..."
+                          : "Hi ${_user?['name'] ?? 'User'}!",
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                      'Laser Focus Squad',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.violet300,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-        ],
+            SizedBox(height: 30),
+            Center(
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        // Daily Check in Emotion/Mood
+                        DailyCheckInEmotion(),
+
+                        //End Daily Check in Emotion/Mood
+                        SizedBox(height: 15),
+
+                        // List Todo Today
+                        GoalsToday(),
+
+                        // End List Todo today
+                        SizedBox(height: 15),
+
+                        RecomendationTask(),
+
+                        SizedBox(height: 15),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
