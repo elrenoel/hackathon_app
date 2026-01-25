@@ -102,12 +102,13 @@
 // }
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/main_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_in/sign_in_page.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_page.dart';
-import 'package:hackathon_app/pages/home_page.dart';
+// import 'package:hackathon_app/pages/home_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -135,7 +136,7 @@ class _WelcomePageState extends State<WelcomePage> {
     if (token != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const MainApp()),
       );
     }
   }

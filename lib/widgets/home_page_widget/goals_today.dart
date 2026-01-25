@@ -148,54 +148,14 @@ class _GoalsTodayState extends State<GoalsToday> {
                           ),
                         ),
 
-                        TextButton(
-                          onPressed: () {},
-                          child: !task.goalsDone
-                              ? Text(
-                                  'Focus Now',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(color: AppColors.violet300),
-                                )
-                              : Text(
-                                  'Done',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(color: AppColors.green),
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          const SizedBox(height: 10),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
-            )
-          else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: goals.length,
-              itemBuilder: (context, index) {
-                final task = goals[index];
-
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(child: Text(task.title)),
-                        Expanded(child: Text(task.durationTime)),
-
                         Row(
                           children: [
-                            // 🗑️ DELETE
+                            // 🗑 DELETE
                             IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Color.fromARGB(255, 75, 75, 75),
+                              ),
                               onPressed: () async {
                                 final confirm = await showDialog<bool>(
                                   context: context,
@@ -227,31 +187,23 @@ class _GoalsTodayState extends State<GoalsToday> {
                                 }
                               },
                             ),
-                            // ✅ TOGGLE DONE / FOCUS
+
+                            // ✅ TOGGLE DONE
                             InkWell(
                               onTap: () async {
-                                print('CLICKED TODO ID: ${task.id}');
                                 final success = await TodoService.toggleTodo(
                                   task.id,
                                 );
-                                if (success) {
-                                  _loadGoals();
-                                }
+                                if (success) _loadGoals();
                               },
-                              child: Row(
-                                children: [
-                                  Text(task.goalsDone ? 'Done' : 'Focus Now'),
-                                  const SizedBox(width: 6),
-                                  Icon(
-                                    task.goalsDone
-                                        ? Icons.check_circle
-                                        : Icons.arrow_forward_ios,
-                                    size: 16,
-                                    color: task.goalsDone
-                                        ? Colors.green
-                                        : Colors.black,
-                                  ),
-                                ],
+                              child: Text(
+                                task.goalsDone ? 'Done' : 'Focus Now',
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: task.goalsDone
+                                          ? AppColors.green
+                                          : AppColors.violet300,
+                                    ),
                               ),
                             ),
                           ],
@@ -262,6 +214,100 @@ class _GoalsTodayState extends State<GoalsToday> {
                 );
               },
             ),
+          // const SizedBox(height: 10),
+          // if (_loading)
+          //   const Padding(
+          //     padding: EdgeInsets.all(16),
+          //     child: CircularProgressIndicator(),
+          //   )
+          // else
+          //   ListView.builder(
+          //     shrinkWrap: true,
+          //     physics: const NeverScrollableScrollPhysics(),
+          //     itemCount: goals.length,
+          //     itemBuilder: (context, index) {
+          //       final task = goals[index];
+
+          //       return Card(
+          //         child: Padding(
+          //           padding: const EdgeInsets.all(12),
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             children: [
+          //               Expanded(child: Text(task.title)),
+          //               Expanded(child: Text(task.durationTime)),
+
+          //               Row(
+          //                 children: [
+          //                   // 🗑️ DELETE
+          //                   IconButton(
+          //                     icon: const Icon(Icons.delete, color: Colors.red),
+          //                     onPressed: () async {
+          //                       final confirm = await showDialog<bool>(
+          //                         context: context,
+          //                         builder: (_) => AlertDialog(
+          //                           title: const Text("Delete todo?"),
+          //                           content: const Text(
+          //                             "This action cannot be undone",
+          //                           ),
+          //                           actions: [
+          //                             TextButton(
+          //                               onPressed: () =>
+          //                                   Navigator.pop(context, false),
+          //                               child: const Text("Cancel"),
+          //                             ),
+          //                             TextButton(
+          //                               onPressed: () =>
+          //                                   Navigator.pop(context, true),
+          //                               child: const Text("Delete"),
+          //                             ),
+          //                           ],
+          //                         ),
+          //                       );
+
+          //                       if (confirm == true) {
+          //                         final success = await TodoService.deleteTodo(
+          //                           task.id,
+          //                         );
+          //                         if (success) _loadGoals();
+          //                       }
+          //                     },
+          //                   ),
+          //                   // ✅ TOGGLE DONE / FOCUS
+          //                   InkWell(
+          //                     onTap: () async {
+          //                       print('CLICKED TODO ID: ${task.id}');
+          //                       final success = await TodoService.toggleTodo(
+          //                         task.id,
+          //                       );
+          //                       if (success) {
+          //                         _loadGoals();
+          //                       }
+          //                     },
+          //                     child: Row(
+          //                       children: [
+          //                         Text(task.goalsDone ? 'Done' : 'Focus Now'),
+          //                         const SizedBox(width: 6),
+          //                         Icon(
+          //                           task.goalsDone
+          //                               ? Icons.check_circle
+          //                               : Icons.arrow_forward_ios,
+          //                           size: 16,
+          //                           color: task.goalsDone
+          //                               ? Colors.green
+          //                               : Colors.black,
+          //                         ),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                 ],
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
         ],
       ),
     );

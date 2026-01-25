@@ -12,7 +12,10 @@ class TodoService {
     final token = prefs.getString("access_token");
 
     if (token == null) throw Exception("Not authenticated");
-
+    // if (token == null) {
+    //   print("🔒 Token null → user belum login");
+    //   return [];
+    // }
     final response = await http.get(
       Uri.parse("$baseUrl/todos/todos"),
       headers: {"Authorization": "Bearer $token", "Accept": "application/json"},
@@ -23,6 +26,7 @@ class TodoService {
     }
 
     throw Exception("Failed to load todos");
+    // return [];
   }
 
   /// POST todo (OPSI A)
@@ -59,7 +63,7 @@ class TodoService {
     final token = prefs.getString("access_token");
 
     if (token == null) {
-      print("❌ TOKEN NULL");
+      // print("❌ TOKEN NULL");
       return false;
     }
 
@@ -89,7 +93,7 @@ class TodoService {
       headers: {"Authorization": "Bearer $token"},
     );
 
-    print('🗑️ DELETE STATUS: ${response.statusCode}');
+    // print('🗑️ DELETE STATUS: ${response.statusCode}');
     return response.statusCode == 204;
   }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
+import 'package:hackathon_app/main_app.dart';
 // import 'package:hackathon_app/pages/sign_up/sign_up_verification_email.dart';
 // import 'package:hackathon_app/widgets/sign_up_widget/step_indicator.dart';
 import 'package:hackathon_app/services/auth_service.dart';
-import 'package:hackathon_app/pages/home_page.dart';
+// import 'package:hackathon_app/pages/home_page.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpAddEmail extends StatefulWidget {
@@ -36,7 +37,7 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
 
     if (error == null) {
       navigator.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const MainApp()),
         (route) => false,
       );
     } else {
