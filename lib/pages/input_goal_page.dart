@@ -46,10 +46,10 @@ class InputGoalPage extends StatefulWidget {
 
 class _InputGoalPageState extends State<InputGoalPage> {
   String valueTaskTitle = '';
-  int? valueDurationHours;
-  int? valueDurationMinutes;
-  // final TextEditingController startTimeController = TextEditingController();
-  DateTime? _startTime;
+  int? valueDurationHours = 0;
+  int? valueDurationMinutes = 0;
+  int? valueDurationSeconds = 0;
+  DateTime? startTime;
   String? valueReminder;
   List<SubTask> subTasks = [];
   List<Map<String, dynamic>> tasks = [];
@@ -85,7 +85,7 @@ class _InputGoalPageState extends State<InputGoalPage> {
               final success = await TodoService.addTodo(
                 title: valueTaskTitle,
                 duration: duration,
-                startTime: _startTime ?? DateTime.now(),
+                startTime: startTime ?? DateTime.now(),
                 reminder: valueReminder,
               );
 
@@ -133,74 +133,79 @@ class _InputGoalPageState extends State<InputGoalPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min, // ⬅️ PENTING
             children: [
               // ===== HEADER =====
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          // ignore: deprecated_member_use
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                  vertical: 16,
+                ),
+                child: Row(
+                  children: [
+                    BackButton(),
+                    const SizedBox(width: 12),
+                    Text(
+                      'New Goal',
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Image.asset('assets/icons/backbtn.png'),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
+
+                child: Column(
+                  children: [
+                    // ===== TASK TITLE =====
+                    FieldTaskTitle(
+                      onChanged: (value) => valueTaskTitle = value,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'New Goal',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ],
+
+                    const SizedBox(height: 16),
+
+                    // ===== DURATION =====
+                    DurationTimeTask(
+                      onChanged: (duration) {
+                        setState(() {
+                          valueDurationHours = duration.inHours;
+                          valueDurationMinutes = duration.inMinutes % 60;
+                          valueDurationSeconds = duration.inSeconds % 60;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ===== START TIME =====
+                    StartTimeTask(
+                      selectedTime: startTime,
+                      onChanged: (value) {
+                        setState(() {
+                          startTime = value;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ===== REMINDER =====
+                    ReminderTask(
+                      onChangedReminder: (value) => valueReminder = value,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ===== SUBTASK =====
+                    SubTaskSection(
+                      onChanged: (value) => subTasks = value.cast<SubTask>(),
+                    ),
+                  ],
+                ),
               ),
-
-              const SizedBox(height: 24),
-
-              // ===== TASK TITLE =====
-              FieldTaskTitle(onChanged: (value) => valueTaskTitle = value),
-
-              const SizedBox(height: 16),
-
-              // ===== DURATION =====
-              DurationTimeTask(
-                onChangedHours: (value) => valueDurationHours = value,
-                onChangedMinutes: (value) => valueDurationMinutes = value,
-              ),
-
-              const SizedBox(height: 16),
-
-              // ===== START TIME =====
-              StartTimeTask(
-                selectedTime: _startTime,
-                onChanged: (value) {
-                  setState(() {
-                    _startTime = value;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              // ===== REMINDER =====
-              ReminderTask(onChangedReminder: (value) => valueReminder = value),
-
-              const SizedBox(height: 20),
-
-              // ===== SUBTASK =====
-              SubTaskSection(onChanged: (value) => subTasks = value),
             ],
           ),
         ),

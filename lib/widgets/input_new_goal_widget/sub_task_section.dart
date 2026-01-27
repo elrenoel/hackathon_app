@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hackathon_app/pages/input_goal_page.dart';
+import 'package:hackathon_app/models/sub_task.dart';
 
 class SubTaskSection extends StatefulWidget {
   final ValueChanged<List<SubTask>> onChanged;
+
   const SubTaskSection({super.key, required this.onChanged});
 
   @override
@@ -10,113 +11,80 @@ class SubTaskSection extends StatefulWidget {
 }
 
 class _SubTaskSectionState extends State<SubTaskSection> {
-  final List<SubTask> subTaskList = [];
-  final TextEditingController subTaskController = TextEditingController();
+  final List<SubTask> _subTasks = [];
+  final TextEditingController _controller = TextEditingController();
   bool isAdding = false;
 
-  @override
-  void dispose() {
-    subTaskController.dispose();
-    super.dispose();
+  void _addSubTask() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _subTasks.add(SubTask(title: text));
+      _controller.clear();
+    });
+
+    // 🔥 INI YANG KAMU KURANG
+    widget.onChanged(List<SubTask>.from(_subTasks));
   }
 
-  void _notifyParent() {
-    widget.onChanged(List.from(subTaskList));
+  void _removeSubTask(SubTask task) {
+    setState(() {
+      _subTasks.remove(task);
+    });
+
+    // 🔥 WAJIB JUGA DI REMOVE
+    widget.onChanged(List<SubTask>.from(_subTasks));
+  }
+
+  void onAddPressed() {
+    setState(() {
+      isAdding = !isAdding;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min, // ⬅️ WAJIB
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ===== HEADER =====
         Row(
           children: [
             Expanded(
               child: Text(
-                'Subtask',
+                'Subtasks',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                setState(() => isAdding = true);
-              },
-            ),
+            IconButton(onPressed: onAddPressed, icon: const Icon(Icons.add)),
           ],
         ),
-
-        // ===== INPUT ADD SUBTASK =====
         if (isAdding)
-          Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: subTaskController,
-                    decoration: const InputDecoration(
-                      hintText: 'Subtask title',
-                      border: InputBorder.none,
-                    ),
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                ),
-                IconButton(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: 'Add subtask',
+                suffixIcon: IconButton(
                   icon: const Icon(Icons.check),
-                  onPressed: () {
-                    if (subTaskController.text.isEmpty) return;
-
-                    setState(() {
-                      subTaskList.add(SubTask(title: subTaskController.text));
-                      subTaskController.clear();
-                      isAdding = false;
-                    });
-
-                    _notifyParent();
-                  },
+                  onPressed: _addSubTask,
                 ),
-              ],
+              ),
             ),
           ),
-
-        // ===== LIST SUBTASK =====
-        ListView.builder(
-          shrinkWrap: true, // ⬅️ KRUSIAL
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: subTaskList.length,
-          itemBuilder: (context, index) {
-            final subTask = subTaskList[index];
-
-            return Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(1, 1),
-                    blurRadius: 3,
-                    color: Colors.black.withOpacity(0.15),
-                  ),
-                ],
+        const SizedBox(height: 12),
+        ..._subTasks.map((subTask) {
+          return Row(
+            children: [
+              Expanded(child: Text(subTask.title)),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () => _removeSubTask(subTask),
               ),
-              child: Text(
-                subTask.title,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            );
-          },
-        ),
+            ],
+          );
+        }),
       ],
     );
   }

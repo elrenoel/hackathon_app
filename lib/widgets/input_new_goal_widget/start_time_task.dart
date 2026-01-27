@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart' show AppColors;
 
@@ -11,46 +12,88 @@ class StartTimeTask extends StatelessWidget {
   Widget build(BuildContext context) {
     final displayText = selectedTime == null
         ? ''
-        : '${selectedTime!.hour.toString().padLeft(2, '0')}:'
-              '${selectedTime!.minute.toString().padLeft(2, '0')}';
+        : TimeOfDay.fromDateTime(selectedTime!).format(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Start Time', style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 10),
-        TextField(
-          readOnly: true,
-          controller: TextEditingController(text: displayText),
-          onTap: () async {
-            final time = await showTimePicker(
-              context: context,
-              initialTime: TimeOfDay.now(),
-            );
-
-            if (time != null) {
-              final now = DateTime.now();
-              final pickedDateTime = DateTime(
-                now.year,
-                now.month,
-                now.day,
-                time.hour,
-                time.minute,
-              );
-
-              onChanged(pickedDateTime);
-            }
-          },
-          decoration: InputDecoration(
-            hintText: 'hh:mm',
-            border: OutlineInputBorder(
+        GestureDetector(
+          onTap: () => _openTimePicker(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.violet300),
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.violet300),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  displayText.isEmpty ? 'Select time' : displayText,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                const Spacer(),
+                const Icon(Icons.access_time),
+              ],
             ),
           ),
-          style: Theme.of(context).textTheme.labelSmall,
         ),
       ],
+    );
+  }
+
+  void _openTimePicker(BuildContext context) {
+    DateTime tempDateTime = selectedTime ?? DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SizedBox(
+          height: 280,
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        onChanged(tempDateTime);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Done'),
+                    ),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  use24hFormat: false, // ⬅️ AM / PM
+                  initialDateTime: tempDateTime,
+                  onDateTimeChanged: (value) {
+                    tempDateTime = value;
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
