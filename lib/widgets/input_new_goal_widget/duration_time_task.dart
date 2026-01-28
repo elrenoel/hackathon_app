@@ -1,95 +1,166 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 
 class DurationTimeTask extends StatefulWidget {
-  final ValueChanged<int>? onChangedHours;
-  final ValueChanged<int>? onChangedMinutes;
+  final ValueChanged<Duration>? onChanged;
 
-  const DurationTimeTask({
-    super.key,
-    this.onChangedHours,
-    this.onChangedMinutes,
-  });
+  const DurationTimeTask({super.key, this.onChanged});
 
   @override
   State<DurationTimeTask> createState() => _DurationTimeTaskState();
 }
 
 class _DurationTimeTaskState extends State<DurationTimeTask> {
-  int valueHours = 0;
-  int valueMinutes = 0;
+  int hours = 0;
+  int minutes = 0;
+  int seconds = 0;
+
+  void _openPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _DurationPicker(
+        initialHours: hours,
+        initialMinutes: minutes,
+        initialSeconds: seconds,
+        onConfirm: (h, m, s) {
+          setState(() {
+            hours = h;
+            minutes = m;
+            seconds = s;
+          });
+          widget.onChanged?.call(
+            Duration(hours: hours, minutes: minutes, seconds: seconds),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Duration Time',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            // Hours
-            Expanded(
-              child: DropdownButtonFormField<int>(
-                initialValue: valueHours,
-                menuMaxHeight: 240,
-                decoration: InputDecoration(
-                  labelText: 'Hours',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.violet300),
-                  ),
-                ),
-                style: Theme.of(context).textTheme.labelSmall,
-                items: List.generate(25, (index) {
-                  return DropdownMenuItem<int>(
-                    value: index,
-                    child: Text('$index'),
-                  );
-                }),
-                onChanged: (value) {
-                  if (value == null) return;
-
-                  setState(() {
-                    valueHours = value;
-                  });
-
-                  widget.onChangedHours?.call(value);
-                },
-              ),
+        Text('Duration', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 12),
+        GestureDetector(
+          onTap: _openPicker,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.violet300),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(width: 12),
-
-            // Minutes
-            Expanded(
-              child: DropdownButtonFormField<int>(
-                initialValue: valueMinutes,
-                menuMaxHeight: 240,
-                decoration: InputDecoration(
-                  labelText: 'Minutes',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.violet300),
-                  ),
+            child: Row(
+              children: [
+                Text(
+                  '${hours.toString().padLeft(2, '0')} : '
+                  '${minutes.toString().padLeft(2, '0')} : '
+                  '${seconds.toString().padLeft(2, '0')}',
                 ),
-                style: Theme.of(context).textTheme.labelSmall,
-                items: List.generate(61, (index) {
-                  return DropdownMenuItem(value: index, child: Text('$index'));
-                }),
-                onChanged: (value) {
-                  setState(() {
-                    valueMinutes = value ?? 0;
-                  });
-                  widget.onChangedMinutes?.call(value!);
-                },
-              ),
+                const Spacer(),
+                const Icon(Icons.access_time),
+              ],
             ),
-          ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _DurationPicker extends StatefulWidget {
+  final int initialHours;
+  final int initialMinutes;
+  final int initialSeconds;
+  final Function(int, int, int) onConfirm;
+
+  const _DurationPicker({
+    required this.initialHours,
+    required this.initialMinutes,
+    required this.initialSeconds,
+    required this.onConfirm,
+  });
+
+  @override
+  State<_DurationPicker> createState() => _DurationPickerState();
+}
+
+class _DurationPickerState extends State<_DurationPicker> {
+  late int h;
+  late int m;
+  late int s;
+
+  @override
+  void initState() {
+    super.initState();
+    h = widget.initialHours;
+    m = widget.initialMinutes;
+    s = widget.initialSeconds;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 280,
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    widget.onConfirm(h, m, s);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: Row(
+              children: [
+                _buildPicker(max: 24, initial: h, onChanged: (v) => h = v),
+                const Text(':'),
+                _buildPicker(max: 60, initial: m, onChanged: (v) => m = v),
+                const Text(':'),
+                _buildPicker(max: 60, initial: s, onChanged: (v) => s = v),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPicker({
+    required int max,
+    required int initial,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Expanded(
+      child: CupertinoPicker(
+        scrollController: FixedExtentScrollController(initialItem: initial),
+        itemExtent: 36,
+        onSelectedItemChanged: onChanged,
+        children: List.generate(
+          max,
+          (index) => Center(child: Text(index.toString().padLeft(2, '0'))),
+        ),
+      ),
     );
   }
 }

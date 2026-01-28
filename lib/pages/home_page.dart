@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                       _loadingUser
                           ? "Loading..."
                           : "Hi ${_user?['name'] ?? 'User'}!",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     Text(
                       'Laser Focus Squad',
