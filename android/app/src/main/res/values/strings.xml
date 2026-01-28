@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">hackathon_app</string>
-    <string name="accessibility_service_description">
-        App Blocker Accessibility Service
+
+    <string name="accessibility_service_desc">
+        Accessibility service for Hackathon App
     </string>
 </resources>

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hackathon_app/models/focus_session_payload.dart';
 import 'package:hackathon_app/services/focus_services.dart';
 import 'package:hackathon_app/services/permission_services.dart';
+import 'package:hackathon_app/widgets/focus_permission_overlay.dart';
 import 'package:hackathon_app/widgets/permission_sheet.dart';
 
 class TimerFocusSessionPage extends StatefulWidget {
@@ -15,7 +16,8 @@ class TimerFocusSessionPage extends StatefulWidget {
   State<TimerFocusSessionPage> createState() => _TimerFocusSessionPageState();
 }
 
-class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
+class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
+    with WidgetsBindingObserver {
   bool isCountdown = true;
 
   final taskController = TextEditingController();
@@ -32,17 +34,82 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
   @override
   void initState() {
     super.initState();
-    currentDuration = widget.payload.duration;
+    WidgetsBinding.instance.addObserver(this);
 
+    currentDuration = widget.payload.duration;
     subtaskStatus = {for (final t in widget.payload.subtasks) t: false};
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && isRunning) {
+      final status = await PermissionService.check();
+
+      final allGranted = status.values.every((e) => e);
+
+      if (!allGranted) {
+        _handlePermissionRevoked();
+      }
+    }
+  }
+
+  void _handlePermissionRevoked() async {
+    // stop timer
+    _timer?.cancel();
+    _timer = null;
+
+    // stop native focus
+    await FocusService.stopFocus();
+
+    if (!mounted) return;
+
+    setState(() => isRunning = false);
+
+    // show UX feedback
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('Focus paused'),
+        content: const Text(
+          'One or more required permissions were disabled. '
+          'Focus session has been stopped.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void start() async {
-    final ok = await ensurePermissions(context);
-    if (!ok) return;
+    // 1️⃣ cek dulu permission
+    final status = await PermissionService.check();
+    final allGranted = status.values.every((e) => e);
 
+    // 2️⃣ kalau BELUM lengkap → tampilkan overlay
+    if (!allGranted) {
+      if (!mounted) return;
+
+      final agreed = await showPermissionOverlay(context);
+      if (!agreed) return;
+
+      final ok = await ensurePermissions(context);
+      if (!ok) return;
+    }
+
+    // 3️⃣ kalau SUDAH lengkap → langsung start
     await FocusService.startFocus(widget.payload.blockedApps);
-
     startTimer();
   }
 
@@ -88,9 +155,11 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
   }
 
   String formatDuration(Duration d) {
+    final hours = d.inHours.toString().padLeft(2, '0');
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+
+    return '$hours:$minutes:$seconds';
   }
 
   Future<bool> ensurePermissions(BuildContext context) async {
@@ -98,17 +167,13 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
 
     if (status.values.every((e) => e)) return true;
 
-    if (!mounted) return false;
-
     await showModalBottomSheet(
-      // ignore: use_build_context_synchronously
       context: context,
       builder: (_) => PermissionSheet(status: status),
     );
 
-    // 🔥 CEK ULANG setelah user balik
     final newStatus = await PermissionService.check();
-    return newStatus.values.every((e) => e);
+    return newStatus.values.every((e) => e); // 🔒 STRICT
   }
 
   @override
@@ -134,8 +199,11 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
               child: Column(
                 children: [
                   Text(
-                    'Duration: ${formatDuration(widget.payload.duration)}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    formatDuration(currentDuration),
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
                   ),
 
                   const SizedBox(height: 16),
@@ -152,7 +220,7 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage> {
                       ),
                     ),
                     child: Text(
-                      isRunning ? 'STOP' : 'START',
+                      isRunning ? 'STOP' : 'START FOCUS',
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),

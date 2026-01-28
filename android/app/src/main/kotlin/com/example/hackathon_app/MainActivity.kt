@@ -12,6 +12,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
 import com.example.hackathon_app.FocusService
+import com.example.hackathon_app.BlockedAppStore
+
 
 class MainActivity : FlutterActivity() {
 
@@ -87,19 +89,24 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
 
                 "startFocus" -> {
-                    val blocked = call.argument<List<String>>("blocked") ?: emptyList()
-                    BlockedAppStore.save(this, blocked)
-                    FocusSessionState.isActive = true
+                    val apps = call.argument<List<String>>("blocked") ?: emptyList()
+                    BlockedAppStore.save(this, apps.toSet())
+
+                    BlockedAppStore.setActive(this, true)
+
+                    startService(Intent(this, FocusService::class.java))
                     result.success(null)
                 }
 
                 "stopFocus" -> {
-                    FocusSessionState.isActive = false
+                    BlockedAppStore.setActive(this, false)
+                    stopService(Intent(this, FocusService::class.java))
                     result.success(null)
                 }
 
                 else -> result.notImplemented()
             }
+            
         }
 
         MethodChannel(

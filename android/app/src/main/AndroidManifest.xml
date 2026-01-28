@@ -19,7 +19,7 @@
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
-        </intent>
+        </intent>   
 
         <!-- Flutter text processing -->
         <intent>
@@ -31,7 +31,6 @@
     <!-- ✅ APPLICATION (HANYA SATU) -->
     <application
         android:label="hackathon_app"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
         <!-- App Blocker Accessibility Service -->
@@ -83,9 +82,8 @@
         <!-- Block Screen -->
         <activity
             android:name=".BlockActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <!-- Flutter embedding -->
         <meta-data

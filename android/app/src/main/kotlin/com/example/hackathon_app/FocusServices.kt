@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
+
 class FocusService : Service() {
 
     companion object {
@@ -21,20 +22,30 @@ class FocusService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        BlockedAppStore.setActive(this, true)
+
         val notification = buildNotification()
         startForeground(1, notification)
+
         return START_STICKY
     }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
+    override fun onDestroy() {
+        BlockedAppStore.setActive(this, false)
+        super.onDestroy()
+    }
+
+
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Focus Mode Active")
             .setContentText("Blocked apps cannot be opened")
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setOngoing(true)
             .build()
     }
