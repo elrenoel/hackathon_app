@@ -15,12 +15,30 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    DeepReadPage(),
-    MapAnaliticsPage(),
-    ProfilePage(),
-  ];
+  // final List<Widget> _pages = const [
+  //   HomePage(),
+  //   DeepReadPage(mood: 'Balanced'),
+  //   MapAnaliticsPage(),
+  //   ProfilePage(),
+  // ];
+  void switchToDeepRead() {
+    setState(() {
+      _currentIndex = 1; // index DeepRead
+    });
+  }
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomePage(onMoodSubmitted: switchToDeepRead),
+      const DeepReadPage(),
+      const MapAnaliticsPage(),
+      const ProfilePage(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

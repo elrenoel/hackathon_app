@@ -1,0 +1,58 @@
+//   switch (mood) {
+  //     case 'Tired':
+  //       return 'Short Focus';
+  //     case 'Stress':
+  //       return 'Calming Read';
+  //     case 'Happy':
+  //       return 'Deep Focus';
+  //     case 'Sad':
+  //       return 'Light Reading';
+  //     default:
+  //       return 'Balanced Focus';
+  //   }
+  // }
+
+  // int get targetMinutes {
+  //   switch (mood) {
+  //     case 'Tired':
+  //       return 15;
+  //     case 'Stress':
+  //       return 20;
+  //     case 'Happy':
+  //       return 45;
+  //     case 'Sad':
+  //       return 25;
+  //     default:
+  //       return 30;
+  //   }
+  // }
+
+  // int get targetArticles {
+  //   switch (mood) {
+  //     case 'Tired':
+  //       return 2;
+  //     case 'Stress':
+  //       return 3;
+  //     case 'Happy':
+  //       return 5;
+  //     case 'Sad':
+  //       return 3;
+  //     default:
+  //       return 4;
+  //   }
+  // }
+
+  // int get targetQuestions {
+  //   switch (mood) {
+  //     case 'Tired':
+  //       return 5;
+  //     case 'Stress':
+  //       return 8;
+  //     case 'Happy':
+  //       return 15;
+  //     case 'Sad':
+  //       return 10;
+  //     default:
+  //       return 12;
+  //   }
+  // }

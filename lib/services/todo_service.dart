@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoService {
-  static const String baseUrl = "http://localhost:8000";
+  static const String baseUrl = "http://127.0.0.1:8000";
+  // static const String baseUrl = "http://192.168.1.4:8000";
   // Android emulator → pakai 10.0.2.2
 
   /// GET todos

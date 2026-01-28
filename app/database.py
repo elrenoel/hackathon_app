@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:ayamgoreng@localhost/flutter"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
+# engine.connect()
+# print("db connected")
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,

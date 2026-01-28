@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
+// import 'package:hackathon_app/pages/home_page.dart';
+// import 'package:hackathon_app/pages/home_page.dart';
 import 'package:hackathon_app/widgets/emotion_btn.dart';
+// import 'package:hackathon_app/pages/deep_read_page.dart';
+import 'package:hackathon_app/services/mood_service.dart';
 
 class DailyCheckInEmotion extends StatefulWidget {
-  const DailyCheckInEmotion({super.key});
+  final VoidCallback onSubmit;
+
+  const DailyCheckInEmotion({super.key, required this.onSubmit});
 
   @override
   State<DailyCheckInEmotion> createState() => _DailyCheckInEmotionState();
@@ -112,15 +118,20 @@ class _DailyCheckInEmotionState extends State<DailyCheckInEmotion> {
 
           // Submit Button
           TextButton(
-            onPressed: () {
-              debugPrint('Button ditekan');
-            },
+            onPressed: selectedEmotion == null
+                ? null
+                : () {
+                    MoodService.saveMood(selectedEmotion!);
+                    widget.onSubmit();
+                  },
             style: TextButton.styleFrom(
-              backgroundColor: AppColors.violet300,
+              backgroundColor: selectedEmotion == null
+                  ? Colors.grey.shade400
+                  : AppColors.violet300,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 100),
+              padding: const EdgeInsets.symmetric(horizontal: 100),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5.0),

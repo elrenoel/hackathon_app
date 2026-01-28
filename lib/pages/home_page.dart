@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/widgets/home_page_widget/daily_check_in_emotion.dart';
+// import 'package:hackathon_app/utils/show_mood_checkin.dart';
 import 'package:hackathon_app/widgets/home_page_widget/goals_today.dart';
 import 'package:hackathon_app/widgets/home_page_widget/recomendation_task.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +9,8 @@ import 'package:hackathon_app/pages/welcome_page.dart';
 import 'package:hackathon_app/services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onMoodSubmitted;
+  const HomePage({super.key, required this.onMoodSubmitted});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -115,7 +117,13 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       children: [
                         // Daily Check in Emotion/Mood
-                        DailyCheckInEmotion(),
+                        DailyCheckInEmotion(onSubmit: widget.onMoodSubmitted),
+                        // ElevatedButton(
+                        //   onPressed: () {
+                        //     showMoodCheckIn(context);
+                        //   },
+                        //   child: const Text("Daily Mood Check-in"),
+                        // ),
 
                         //End Daily Check in Emotion/Mood
                         SizedBox(height: 15),

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl = "http://127.0.0.1:8000"; // Flutter Web
+  // static const String baseUrl = "http://192.168.1.4:8000";
 
   static Future<List<dynamic>> fetchTodos() async {
     final res = await http.get(Uri.parse("$baseUrl/todos"));

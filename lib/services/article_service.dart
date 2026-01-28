@@ -1,30 +1,29 @@
-import 'dart:convert';
-import 'package:hackathon_app/helper/html_parse.dart';
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
+import 'package:hackathon_app/data/article_dummy.dart';
 import 'package:hackathon_app/models/article.dart';
-import 'package:http/http.dart' as http;
+import 'package:hackathon_app/models/article_meta.dart';
+// import 'package:hackathon_app/data/article_dummy.dart';
+// import 'package:hackathon_app/helper/html_parse.dart';
 
 class ArticleService {
-  static Future<Article> fetchArticle(String title) async {
-    final url = Uri.parse(
-      'https://en.wikipedia.org/w/api.php'
-      '?action=parse'
-      '&page=$title'
-      '&prop=text'
-      '&format=json'
-      '&origin=*',
+  static List<ArticleMeta> getArticlesByMood(String mood) {
+    // return getArticlesByMood(mood);
+    return allArticles.where((a) => a.moods.contains(mood)).take(3).toList();
+  }
+
+  static Future<Article> fetchArticleContent(ArticleMeta meta) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    return Article(
+      title: meta.title,
+      paragraphs: [
+        meta.description,
+        '',
+        'This article is originally published on Medium.',
+        'Source:',
+        meta.sourceUrl,
+      ],
     );
-
-    final res = await http.get(url);
-
-    if (res.statusCode != 200) {
-      throw Exception('Failed to load article');
-    }
-
-    final json = jsonDecode(res.body);
-
-    final html = json['parse']['text']['*'];
-    final paragraphs = htmlToParagraphs(html);
-
-    return Article(title: json['parse']['title'], paragraphs: paragraphs);
   }
 }

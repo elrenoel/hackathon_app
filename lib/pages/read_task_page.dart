@@ -1,21 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/models/article.dart';
+import 'package:hackathon_app/models/article_meta.dart';
 import 'package:hackathon_app/services/article_service.dart';
+import 'dart:async';
+import 'package:hackathon_app/services/reading_progress_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReadTaskPage extends StatefulWidget {
-  const ReadTaskPage({super.key});
+  final ArticleMeta articleMeta;
+
+  const ReadTaskPage({super.key, required this.articleMeta});
 
   @override
   State<ReadTaskPage> createState() => _ReadTaskPageState();
 }
 
 class _ReadTaskPageState extends State<ReadTaskPage> {
+  Timer? _timer;
+  // bool _timerInitialized = false;
+  int _remainingSeconds = 0;
+  String get formattedTime {
+    final minutes = (_remainingSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_remainingSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   final ScrollController _controller = ScrollController();
   final ValueNotifier<double> scrollPercent = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
+    _remainingSeconds = widget.articleMeta.duration * 60;
+
+    _timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() {
+          _remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
     _controller.addListener(() {
       final max = _controller.position.maxScrollExtent;
       final current = _controller.position.pixels;
@@ -26,9 +52,17 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // final article = widget.article;
     return FutureBuilder<Article>(
-      future: ArticleService.fetchArticle('Artificial_intelligence'),
+      future: ArticleService.fetchArticleContent(widget.articleMeta),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
@@ -37,7 +71,11 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
         }
 
         final article = snapshot.data!;
+        // if (!_timerInitialized) {
+        //   widget.articleMeta.duration * 60;
+        // }
 
+        // _timerInitialized = true;
         return Scaffold(
           body: Stack(
             children: [
@@ -83,11 +121,25 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
                                 style: Theme.of(context).textTheme.labelMedium,
                               ),
                               Text(
-                                '09:32',
+                                formattedTime,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
                           ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.open_in_new),
+                          tooltip: 'Open original article',
+                          onPressed: () async {
+                            final url = widget.articleMeta.sourceUrl;
+
+                            if (url.isEmpty) return;
+
+                            await launchUrl(
+                              Uri.parse(url),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
                         ),
                         ValueListenableBuilder<double>(
                           valueListenable: scrollPercent,
@@ -142,7 +194,13 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
                     if (value < 85) return const SizedBox.shrink();
 
                     return ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        ReadingProgressService.addReadingSession(
+                          minutes: widget.articleMeta.duration,
+                        );
+
+                        Navigator.pop(context); // balik ke DeepRead
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                       ),
