@@ -1,13 +1,10 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-# from routers import database, schemas, models, utils, oauth2
-from app import database
-from app import schemas
-from app import models
-from app import utils
-from app import oauth2
+
+from app import database, schemas, models, utils, oauth2
 
 
 router = APIRouter(
@@ -15,40 +12,104 @@ router = APIRouter(
     tags=["Authentication"]
 )
 
-@router.post("/register",response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
-def register(
-    user: schemas.UserCreate,
+# =========================
+# SEND OTP
+# =========================
+@router.post("/register/send-otp")
+def send_otp(
+    payload: schemas.SendOTPRequest,
     db: Session = Depends(database.get_db)
 ):
-    hashed_pw = utils.hash_password(user.password)
+    # 1. email sudah terdaftar?
+    if db.query(models.User).filter(
+        models.User.email == payload.email
+    ).first():
+        raise HTTPException(400, "Email already registered")
 
-    new_user = models.User(
-        email=user.email,
-        password=hashed_pw,
-        name= user.name
+    # 2. cegah spam OTP
+    existing_otp = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == payload.email,
+        models.EmailVerification.is_used == False,
+        models.EmailVerification.expires_at > datetime.utcnow()
+    ).first()
+
+    if existing_otp:
+        raise HTTPException(429, "OTP already sent. Please wait.")
+
+    otp = utils.generate_otp()
+
+    record = models.EmailVerification(
+        email=payload.email,
+        name=payload.name,
+        otp=otp,
+        expires_at=utils.otp_expiry()
     )
-    existing_name = db.query(models.User).filter(
-        models.User.name == user.name).first()
 
-    if existing_name:
-        raise HTTPException(
-            status_code=400,
-            detail="Name already taken"
+    db.add(record)
+    db.commit()
+
+    # kirim email OTP
+    utils.send_otp_email(payload.email, otp)
+
+    return {"message": "OTP sent"}
+
+
+# =========================
+# VERIFY OTP
+# =========================
+@router.post("/register/verify-otp")
+def verify_otp(
+    payload: schemas.VerifyOTPRequest,
+    db: Session = Depends(database.get_db)
+):
+    record = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == payload.email,
+        models.EmailVerification.otp == payload.otp,
+        models.EmailVerification.is_used == False
+    ).first()
+
+    if not record or record.expires_at < datetime.utcnow():
+        raise HTTPException(400, "Invalid or expired OTP")
+
+    record.is_used = True
+    db.commit()
+
+    return {"message": "OTP verified"}
+
+
+# =========================
+# SET PASSWORD
+# =========================
+@router.post("/register/set-password", status_code=201)
+def set_password(
+    payload: schemas.SetPasswordRequest,
+    db: Session = Depends(database.get_db)
+):
+    verification = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == payload.email,
+        models.EmailVerification.is_used == True
+    ).first()
+
+    if not verification:
+        raise HTTPException(400, "Email not verified")
+
+    user = models.User(
+        email=payload.email,
+        name=verification.name,
+        password=utils.hash_password(payload.password),
+        is_verified=True,
     )
 
-    try:
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        return new_user
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email sudah terdaftar"
-        )
+    return {"message": "Account created"}
 
+
+# =========================
+# LOGIN
+# =========================
 @router.post("/login", response_model=schemas.Token)
 def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),

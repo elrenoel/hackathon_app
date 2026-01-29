@@ -1,16 +1,29 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
+
+class EmailVerification(Base):
+    __tablename__ = "email_verifications"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False)
+    name = Column(String, nullable=False)  # ⬅️ TAMBAH
+    otp = Column(String, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    is_used = Column(Boolean, default=False)
+
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(String, nullable=True)  # ⬅️ belum ada di awal
     name = Column(String, unique=True, nullable=False)
+    is_verified = Column(Boolean, default=False)
 
     todos = relationship("Todo", back_populates="owner")
+
 
 
 class Todo(Base):

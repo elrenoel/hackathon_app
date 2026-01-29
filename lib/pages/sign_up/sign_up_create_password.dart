@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_done.dart';
+import 'package:hackathon_app/services/auth_service.dart';
 import 'package:hackathon_app/widgets/sign_up_widget/requirement_item.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpCreatePassword extends StatefulWidget {
-  const SignUpCreatePassword({super.key});
+  final String email;
+
+  const SignUpCreatePassword({super.key, required this.email});
 
   @override
   State<SignUpCreatePassword> createState() => _SignUpCreatePasswordState();
@@ -14,6 +17,13 @@ class SignUpCreatePassword extends StatefulWidget {
 class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
   final TextEditingController _controller = TextEditingController();
   bool _obscure = true;
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   bool get hasTyping => _controller.text.isNotEmpty;
   bool get hasMinLength => _controller.text.length >= 8;
@@ -31,21 +41,36 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
   }
 
   Color get strengthColor {
-    switch (strength) {
-      case 1:
-        return AppColors.black4;
-      case 2:
-        return AppColors.redPrimary;
-      case 3:
-        return AppColors.yellow;
-      case 4:
-        return AppColors.yellow;
-      case 5:
-        return AppColors.yellow;
-      case 6:
-        return AppColors.green;
-      default:
-        return AppColors.gray500;
+    if (strength <= 1) return AppColors.black4;
+    if (strength <= 2) return AppColors.redPrimary;
+    if (strength <= 5) return AppColors.yellow;
+    return AppColors.green;
+  }
+
+  Future<void> submit() async {
+    if (strength != 6) return;
+
+    setState(() => _loading = true);
+
+    final error = await AuthService.setPassword(
+      email: widget.email,
+      password: _controller.text,
+    );
+
+    if (!mounted) return;
+
+    setState(() => _loading = false);
+
+    if (error == null) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const SignUpDone()),
+        (_) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
@@ -54,9 +79,8 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
-        spacing: 17,
         children: [
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Row(
             children: [
               BackButton(color: AppColors.black5),
@@ -73,12 +97,7 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(
-                right: 16,
-                left: 16,
-                top: 10,
-                bottom: 32,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -86,14 +105,13 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
                     'Password',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+
                   const SizedBox(height: 8),
 
-                  /// Password field
                   TextField(
                     controller: _controller,
                     obscureText: _obscure,
                     onChanged: (_) => setState(() {}),
-                    style: Theme.of(context).textTheme.bodySmall,
                     decoration: InputDecoration(
                       hintText: 'Enter password',
                       suffixIcon: IconButton(
@@ -110,12 +128,11 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
 
                   const SizedBox(height: 12),
 
-                  /// Strength bar
                   LinearProgressIndicator(
                     value: strength / 6,
                     minHeight: 6,
+                    valueColor: AlwaysStoppedAnimation<Color>(strengthColor),
                     backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation(strengthColor),
                     borderRadius: BorderRadius.circular(999),
                   ),
 
@@ -125,39 +142,29 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
                   RequirementItem('a number', hasNumber),
                   RequirementItem('a symbol', hasSymbol),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 20),
 
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {
-                        if (strength == 6) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpDone(),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: _loading ? null : submit,
                       style: FilledButton.styleFrom(
                         backgroundColor: strength == 6
                             ? AppColors.violet400
                             : AppColors.violet200,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 18),
                       ),
-                      child: Text(
-                        'Continue',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-                      ),
+                      child: _loading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text('Continue'),
                     ),
                   ),
-                  Spacer(),
+
+                  const Spacer(),
+
                   Center(
                     child: Text(
                       'By using Neura, you agree to the \n Terms and Privacy Policy.',

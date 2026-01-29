@@ -16,7 +16,7 @@ class GoalsToday extends StatefulWidget {
 class _GoalsTodayState extends State<GoalsToday> {
   // 🔹 STATE
   List<Task> goals = [];
-  final bool _loading = true;
+  bool _loading = true;
 
   // 🔹 LOAD DATA SAAT WIDGET DIBUAT
   @override
@@ -27,6 +27,10 @@ class _GoalsTodayState extends State<GoalsToday> {
 
   //AMBIL
   Future<void> _loadGoals() async {
+    setState(() {
+      _loading = true;
+    });
+
     final todos = await TodoService.fetchTodos();
 
     if (!mounted) return;
@@ -42,13 +46,15 @@ class _GoalsTodayState extends State<GoalsToday> {
           ),
           reminder: todo['reminder'] ?? '',
           goalsDone: todo['is_done'] ?? false,
-
-          // 🔥 INI KUNCI
           subTasks: (todo['subtasks'] as List? ?? [])
               .map((s) => SubTask.fromJson(s))
               .toList(),
         );
       }).toList();
+
+      print("GOALS LENGTH: ${goals.length}");
+
+      _loading = false; // 🔥 INI KUNCI
     });
   }
 
@@ -232,11 +238,6 @@ class _GoalsTodayState extends State<GoalsToday> {
 
                           InkWell(
                             onTap: () {
-                              print(
-                                "🔥 TODO.SUBTASKS (SEBELUM PAYLOAD): ${task.subTasks}",
-                              );
-                              print("🔥 TODO RAW: $task");
-
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

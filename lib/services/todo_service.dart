@@ -52,10 +52,6 @@ class TodoService {
       body: jsonEncode(body),
     );
 
-    print("REQUEST BODY: $body");
-    print("STATUS CODE: ${response.statusCode}");
-    print("RESPONSE BODY: ${response.body}");
-
     return response.statusCode == 200 || response.statusCode == 201;
   }
 

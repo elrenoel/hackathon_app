@@ -24,6 +24,23 @@ class SubtaskResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        
+# OTP Schema
+
+class SendOTPRequest(BaseModel):
+    email: EmailStr
+    name: str
+
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class SetPasswordRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+
 
 
 # =======================
