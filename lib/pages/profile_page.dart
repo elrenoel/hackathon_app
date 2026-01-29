@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hackathon_app/pages/welcome_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,6 +11,39 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic>? _user;
+  bool _loadingUser = true;
+
+  Future<void> _fetchUser() async {
+    final user = await AuthService.getCurrentUser();
+
+    if (!mounted) return;
+
+    setState(() {
+      _user = user;
+      _loadingUser = false;
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("access_token"); // ⚠️ HARUS SAMA KEY-NYA
+
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const WelcomePage()),
+      (route) => false,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,13 +88,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Sarah Jansen', // dummy
+                Text(
+                  _loadingUser ? 'Loading...' : _user?['name'] ?? 'User',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'sarah.jansen@gmail.com', // dummy
+                  _loadingUser ? '' : _user?['email'] ?? '',
                   style: Theme.of(
                     context,
                   ).textTheme.bodySmall?.copyWith(color: Colors.black54),
@@ -73,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
-              children: const [
+              children: [
                 _ProfileMenuItem(icon: Icons.edit, title: 'Edit Profile'),
                 _ProfileMenuItem(
                   icon: Icons.lock_outline,
@@ -84,7 +120,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   icon: Icons.settings_outlined,
                   title: 'Settings',
                 ),
-                _ProfileMenuItem(icon: Icons.logout, title: 'Log out'),
+                _ProfileMenuItem(
+                  icon: Icons.logout,
+                  title: 'Log out',
+                  onTap: _showLogoutConfirmDialog,
+                ),
               ],
             ),
           ),
@@ -92,46 +132,85 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+  Future<void> _showLogoutConfirmDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Log out'),
+          content: const Text(
+            'Are you sure you want to log out from your account?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // tutup dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // tutup dialog
+                _logout(); // logout sebenarnya
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+              ),
+              child: const Text(
+                'Log out',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _ProfileMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final VoidCallback? onTap;
 
-  const _ProfileMenuItem({required this.icon, required this.title});
+  const _ProfileMenuItem({required this.icon, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEDE7F6),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, size: 20, color: Color(0xFF7C4DFF)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(title, style: Theme.of(context).textTheme.bodyMedium),
-          ),
-          const Icon(Icons.chevron_right),
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDE7F6),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 20, color: Color(0xFF7C4DFF)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title, style: Theme.of(context).textTheme.bodyMedium),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
       ),
     );
   }
