@@ -17,8 +17,12 @@ final List<ArticleMeta> allArticles = [
     description: 'Cara masuk ke kondisi fokus maksimal tanpa distraksi.',
     duration: 15,
     moods: ['Happy'],
-    sourceUrl: 'https://medium.com/@username/focus-superpower',
-    paragraphs: dummyParagraphs('Flow State for Deep Focus'),
+    sourceUrl:
+        'https://medium.com/language-lab/how-to-learn-multiple-languages-at-the-same-time-005fb66f46a7',
+    paragraphs: [
+      'For a long time, I’ve been the strongest opponent to the idea of learning 2 languages at the same time. To be honest, this was probably due to the perfectionist in me, thinking that you need to dedicate as much time as possible to the target language of your choice.But learning 2 languages at the same time is not an impossible task. I grew up with 2 languages. I acquired both languages as a kid, so that’s kind of different. I’d also like to point out that Haitian Creole is a French Creole. This means that it shares lots of similarities with the French language.I also started learning Spanish while I was still an upper-intermediate student of English. I decided to learn Spanish…'
+          'Language development Language development is a complex phenomenon, acting as a means of developing reasoning, thought and communication. The development of language is a mixture of learning and innate processes.Learning processesImitation plays some role in learning language, but cannot be the only means of developing language. Conditioning may also help the process, but adults do not pay attention to every detail of speech uttered by infants.Children also appear to learn a set of operating principles, which allows them to generalize certain constructions, e.g. the addition of ‘-ed’ to a verb to form the past tense, e.g. ‘walk, walked’. Children learn gradually not to over-generalize, e.g. ‘go, goed’, and to recognize irregular verbs.Innate processesAll children, regardless of culture, seem to go through the same sequence of language development, implying an innate knowledge. Language development also has critical periods when it is easier to learn languages, such as the early years of life.One of the foremost theorists in this area is Noam Chomsky, whose work has spawned a new science of neurolinguistics. He suggests that language development is built in (Chomsky 1972). The theory then becomes very dense, but a summary is shown in Table 4.3.Chomsky has been criticized on the grounds of reading adult meanings into childrens speech. He also believes that language should be studied separately from other aspects of development.',
+    ],
   ),
   ArticleMeta(
     id: 2,

@@ -17,13 +17,8 @@ class ArticleService {
 
     return Article(
       title: meta.title,
-      paragraphs: [
-        meta.description,
-        '',
-        'This article is originally published on Medium.',
-        'Source:',
-        meta.sourceUrl,
-      ],
+      paragraphs: meta.paragraphs,
+      // sourceUrl: meta.sourceUrl,
     );
   }
 }

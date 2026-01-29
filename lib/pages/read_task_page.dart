@@ -165,7 +165,7 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Text(
                               article.title,
-                              style: Theme.of(context).textTheme.labelLarge,
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           );
                         }
@@ -174,9 +174,13 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
                           padding: const EdgeInsets.only(bottom: 16),
                           child: Text(
                             article.paragraphs[index - 1],
-                            style: Theme.of(
-                              context,
-                            ).textTheme.displayMedium?.copyWith(height: 1.8),
+                            textAlign: TextAlign.justify,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: 16,
+                                  height: 1.8,
+                                  letterSpacing: 0.2,
+                                ),
                           ),
                         );
                       },

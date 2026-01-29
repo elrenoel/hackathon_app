@@ -4,6 +4,7 @@ import 'package:hackathon_app/data/article_dummy.dart';
 import 'package:hackathon_app/models/article_meta.dart';
 import 'package:hackathon_app/services/reading_progress_service.dart';
 import 'dart:math';
+import 'package:hackathon_app/services/auth_service.dart';
 // import 'package:hackathon_app/services/mood_service.dart';
 // import 'package:hackathon_app/utils/show_mood_checkin.dart';
 // import 'package:hackathon_app/widgets/home_page_widget/daily_check_in_emotion.dart';
@@ -16,14 +17,38 @@ class DeepReadPage extends StatefulWidget {
 }
 
 class _DeepReadPageState extends State<DeepReadPage> {
-  // String get mood {
-  //   final savedMood = MoodService.todayMood;
-  //   if (savedMood.isEmpty) return 'Balanced';
-  //   return savedMood;
-  // }
+  Map<String, dynamic>? _user;
+  bool _loadingUser = true;
 
   List<ArticleMeta> get articles {
     return getDefaultArticles();
+  }
+
+  final List<String> _focusOpeners = [
+    'Fokusmu hari ini cukup seimbang.',
+    'Hari ini ritme fokusmu berada di kondisi yang stabil.',
+    'Kondisi fokusmu hari ini terjaga dengan baik.',
+  ];
+
+  final List<String> _focusDirections = [
+    'Luangkan waktu membaca secara perlahan.',
+    'Cukupkan diri dengan membaca tanpa terburu-buru.',
+    'Ambil jeda dan nikmati setiap bacaan.',
+  ];
+
+  final List<String> _focusClosings = [
+    'Tidak perlu banyak, yang penting tetap sadar.',
+    'Fokus pada kualitas, bukan jumlah.',
+    'Biarkan pikiran bekerja dengan ritmenya sendiri.',
+  ];
+  String generateFocusDescription() {
+    final random = Random();
+
+    final opener = _focusOpeners[random.nextInt(_focusOpeners.length)];
+    final direction = _focusDirections[random.nextInt(_focusDirections.length)];
+    final closing = _focusClosings[random.nextInt(_focusClosings.length)];
+
+    return '$opener $direction $closing';
   }
 
   final List<String> motivationalQuotes = [
@@ -36,6 +61,7 @@ class _DeepReadPageState extends State<DeepReadPage> {
     'Sedikit demi sedikit tetap progres.',
   ];
   late String currentQuote;
+  late String focusDescription;
   String get focusType => 'Balanced Focus';
   final int targetMinutes = 30;
   final int targetArticles = 3;
@@ -43,10 +69,22 @@ class _DeepReadPageState extends State<DeepReadPage> {
   int get progressMinutes => ReadingProgressService.minutesReadToday;
   int get progressArticles => ReadingProgressService.articlesReadToday;
   bool get isArticleTargetReached => progressArticles >= targetArticles;
+  Future<void> _fetchUser() async {
+    final user = await AuthService.getCurrentUser();
+
+    if (!mounted) return;
+
+    setState(() {
+      _user = user;
+      _loadingUser = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _fetchUser();
+    focusDescription = generateFocusDescription();
     _generateRandomQuote();
   }
 
@@ -97,7 +135,9 @@ class _DeepReadPageState extends State<DeepReadPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "(Name), a $focusType!",
+                        _loadingUser
+                            ? "Loading..."
+                            : "${_user?['name'] ?? 'User'}, $focusType!",
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
 
@@ -119,7 +159,7 @@ class _DeepReadPageState extends State<DeepReadPage> {
                           ],
                         ),
                         child: Text(
-                          'Penjelasan singkat mengenai tingkat fokus yang dimiliki berdasarkan type dan rekomendasi waktu membaca dan banyak bacaan minimum yang dikonsumsi tiap harinya',
+                          focusDescription,
                           style: Theme.of(
                             context,
                           ).textTheme.bodySmall?.copyWith(fontSize: 12),
@@ -292,6 +332,8 @@ class _DeepReadPageState extends State<DeepReadPage> {
                                     ),
                                   );
                                   setState(() {
+                                    focusDescription =
+                                        generateFocusDescription();
                                     _generateRandomQuote();
                                   });
                                 },

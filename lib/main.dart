@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hackathon_app/pages/focus_session.dart';
+// import 'package:hackathon_app/pages/focus_session.dart';
 // import 'package:hackathon_app/main_app.dart';
+import 'package:hackathon_app/pages/welcome_page.dart';
 // import 'package:hackathon_app/pages/welcome_page.dart';
 // import 'package:hackathon_app/pages/profiling/profiling_begin.dart';
 // import 'package:hackathon_app/pages/welcome_page.dart';
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const FocusSession(),
+      home: const WelcomePage(),
     );
   }
 }
