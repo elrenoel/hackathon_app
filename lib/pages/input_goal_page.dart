@@ -7,6 +7,7 @@ import 'package:hackathon_app/widgets/input_new_goal_widget/field_task_title.dar
 import 'package:hackathon_app/widgets/input_new_goal_widget/reminder_task.dart';
 import 'package:hackathon_app/widgets/input_new_goal_widget/start_time_task.dart';
 import 'package:hackathon_app/widgets/input_new_goal_widget/sub_task_section.dart';
+import 'package:hackathon_app/models/sub_task.dart';
 
 class Task {
   final int id;
@@ -26,15 +27,6 @@ class Task {
     required this.reminder,
     required this.goalsDone,
   });
-}
-
-class SubTask {
-  final String title;
-  bool isDone;
-
-  SubTask({required this.title, this.isDone = false});
-
-  Map<String, dynamic> toJson() => {'title': title, 'isDone': isDone};
 }
 
 class InputGoalPage extends StatefulWidget {
@@ -87,6 +79,7 @@ class _InputGoalPageState extends State<InputGoalPage> {
                 duration: duration,
                 startTime: startTime ?? DateTime.now(),
                 reminder: valueReminder,
+                subTasks: subTasks, // 🔥 INI KUNCI
               );
 
               if (!mounted) return;
@@ -201,7 +194,9 @@ class _InputGoalPageState extends State<InputGoalPage> {
 
                     // ===== SUBTASK =====
                     SubTaskSection(
-                      onChanged: (value) => subTasks = value.cast<SubTask>(),
+                      onChanged: (value) => setState(() {
+                        subTasks = value;
+                      }),
                     ),
                   ],
                 ),

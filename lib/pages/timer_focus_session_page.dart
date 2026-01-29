@@ -36,6 +36,9 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    print("🔥 PAYLOAD RAW: ${widget.payload}");
+    print("🔥 PAYLOAD SUBTASKS: ${widget.payload.subtasks}");
+
     currentDuration = widget.payload.duration;
     subtaskStatus = {for (final t in widget.payload.subtasks) t: false};
   }
@@ -93,11 +96,16 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
   }
 
   void start() async {
-    // 1️⃣ cek dulu permission
+    // 🔥 kalau dari TODO → langsung start timer
+    if (!widget.payload.needPermission) {
+      startTimer();
+      return;
+    }
+
+    // ===== logic lama (focus session) =====
     final status = await PermissionService.check();
     final allGranted = status.values.every((e) => e);
 
-    // 2️⃣ kalau BELUM lengkap → tampilkan overlay
     if (!allGranted) {
       if (!mounted) return;
 
@@ -108,7 +116,6 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
       if (!ok) return;
     }
 
-    // 3️⃣ kalau SUDAH lengkap → langsung start
     await FocusService.startFocus(widget.payload.blockedApps);
     startTimer();
   }
@@ -125,7 +132,9 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
             _timer?.cancel();
             _timer = null;
             setState(() => isRunning = false);
-            FocusService.stopFocus(); // fire-and-forget
+            if (widget.payload.needPermission) {
+              FocusService.stopFocus();
+            } // fire-and-forget
           } else {
             currentDuration -= const Duration(seconds: 1);
           }
@@ -141,7 +150,9 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
     _timer = null;
 
     // 🔥 STOP FOCUS MODE (native)
-    await FocusService.stopFocus();
+    if (widget.payload.needPermission) {
+      await FocusService.stopFocus();
+    }
 
     setState(() => isRunning = false);
   }
@@ -271,18 +282,21 @@ class _TimerFocusSessionPageState extends State<TimerFocusSessionPage>
             const SizedBox(height: 16),
 
             // SUBTASK
-            const Text('Subtasks'),
-            ...subtaskStatus.entries.map((entry) {
-              return CheckboxListTile(
-                title: Text(entry.key),
-                value: entry.value,
-                onChanged: (v) {
-                  setState(() {
-                    subtaskStatus[entry.key] = v ?? false;
-                  });
-                },
-              );
-            }),
+            if (widget.payload.subtasks.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Text('Subtasks'),
+              ...subtaskStatus.entries.map((entry) {
+                return CheckboxListTile(
+                  title: Text(entry.key),
+                  value: entry.value,
+                  onChanged: (v) {
+                    setState(() {
+                      subtaskStatus[entry.key] = v ?? false;
+                    });
+                  },
+                );
+              }),
+            ],
           ],
         ),
       ),
