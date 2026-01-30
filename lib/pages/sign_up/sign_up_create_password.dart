@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/pages/sign_up/sign_up_done.dart';
+import 'package:hackathon_app/pages/profiling/profiling_begin.dart';
 import 'package:hackathon_app/services/auth_service.dart';
 import 'package:hackathon_app/widgets/sign_up_widget/requirement_item.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
@@ -18,6 +18,14 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
   final TextEditingController _controller = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -64,7 +72,7 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
     if (error == null) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const SignUpDone()),
+        MaterialPageRoute(builder: (_) => const ProfilingBegin()),
         (_) => false,
       );
     } else {
@@ -93,7 +101,9 @@ class _SignUpCreatePasswordState extends State<SignUpCreatePassword> {
             ],
           ),
 
+          const SizedBox(height: 10),
           stepIndicator(3, 3),
+          const SizedBox(height: 20),
 
           Expanded(
             child: Padding(

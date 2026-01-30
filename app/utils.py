@@ -57,4 +57,23 @@ def send_otp_email(to_email: str, otp: str):
         smtp.login(SMTP_EMAIL, SMTP_PASSWORD)
         smtp.send_message(msg)
 
+def calculate_persona(answers: list[int]) -> str:
+    score = 0
+
+    for a in answers:
+        if a == 0:
+            score += 2
+        elif a == 1:
+            score += 1
+        elif a == 2:
+            score += 0
+
+    if score >= 8:
+        return "laser_focus"
+    elif score >= 4:
+        return "ping_pong"
+    else:
+        return "butterfly"
+
+
 

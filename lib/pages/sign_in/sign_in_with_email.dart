@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/main_app.dart';
+import 'package:hackathon_app/pages/app_start_page.dart';
 import 'package:hackathon_app/services/auth_service.dart';
 // import 'package:hackathon_app/pages/home_page.dart';
 
@@ -33,7 +33,7 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
     if (success && mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainApp()),
+        MaterialPageRoute(builder: (_) => const AppStartPage()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

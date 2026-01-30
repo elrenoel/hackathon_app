@@ -30,7 +30,7 @@
 
     <!-- ✅ APPLICATION (HANYA SATU) -->
     <application
-        android:label="hackathon_app"
+        android:label="Neura"
         android:icon="@mipmap/ic_launcher">
 
         <!-- App Blocker Accessibility Service -->

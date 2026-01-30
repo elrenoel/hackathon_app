@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/pages/profiling/profiling_calculate_result.dart';
+import 'package:hackathon_app/pages/profiling/profiling_calculating_result.dart';
+import 'package:hackathon_app/services/auth_service.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class Question {
@@ -49,7 +50,7 @@ final List<Question> questions = [
   Question(
     title: 'Question 4',
     question:
-        'When you tell yourself “I’ll focus for X minutes,” what usually happens?',
+        'When you tell yourself “I’ll focus for 60 minutes,” what usually happens?',
     options: [
       'I stick to the plan',
       'I mostly stick to it, with a few pauses',
@@ -63,6 +64,19 @@ final List<Question> questions = [
     options: ['Rarely', 'Sometimes', 'Often'],
   ),
 ];
+
+int optionIndexToScore(int index) {
+  switch (index) {
+    case 0:
+      return 3;
+    case 1:
+      return 2;
+    case 2:
+      return 1;
+    default:
+      return 0;
+  }
+}
 
 class ProfilingQuestions extends StatefulWidget {
   const ProfilingQuestions({super.key});
@@ -105,11 +119,34 @@ class _ProfilingQuestionsState extends State<ProfilingQuestions> {
     });
   }
 
-  void finish() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProfilingCalculateResult()),
-    );
+  List<Map<String, int>> buildProfilingPayload() {
+    return List.generate(questions.length, (index) {
+      return {
+        'question': index + 1,
+        'answer_index': answers[index]!, // 0 / 1 / 2
+      };
+    });
+  }
+
+  void finish() async {
+    final payload = buildProfilingPayload();
+
+    final persona = await AuthService.submitProfiling(answers: payload);
+
+    if (!mounted) return;
+
+    if (persona != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ProfilingCalculatingResult(persona: persona),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to calculate profiling')),
+      );
+    }
   }
 
   @override

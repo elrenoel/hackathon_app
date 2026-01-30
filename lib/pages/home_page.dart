@@ -50,6 +50,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  String getPersonaLabel(String? persona) {
+    switch (persona) {
+      case 'ping_pong':
+        return 'Ping-Pong Thinkers';
+      case 'laser_focus':
+        return 'Laser Focus Squad';
+      case 'butterfly':
+        return 'Butterfly Browsers';
+      default:
+        return 'No persona';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -98,7 +111,9 @@ class _HomePageState extends State<HomePage> {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     Text(
-                      'Laser Focus Squad',
+                      _loadingUser
+                          ? "Loading persona..."
+                          : getPersonaLabel(_user?['persona']),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.violet300,
                       ),

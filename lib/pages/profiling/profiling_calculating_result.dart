@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/pages/profiling/profiling_questions.dart';
+import 'package:hackathon_app/pages/profiling/profiling_result_page.dart';
 
-class ProfilingBegin extends StatelessWidget {
-  const ProfilingBegin({super.key});
+class ProfilingCalculatingResult extends StatelessWidget {
+  final String persona;
+
+  const ProfilingCalculatingResult({super.key, required this.persona});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class ProfilingBegin extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Image.asset(
-                  'assets/images/profiling.png',
+                  'assets/images/9.png',
                   height: size.height * 0.32, // ❗ responsive
                   fit: BoxFit.contain,
                 ),
@@ -46,13 +48,13 @@ class ProfilingBegin extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        'Begin Your Focus Journey',
+                        'Mapping Your Focus Patterns',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Neura is a space to explore and strengthen your attention through guided thinking and deep reading. Before you start, you’ll take 5 quick questions to map how your mind works, so every session feels more personal and effective.',
+                        'We’re analyzing your responses to understand how your attention works and tailor your experience in Neura. This result is based on self-reflection, not a medical or psychological assessment, and should be used as a personal guide rather than a fixed diagnosis.',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           height: 1.8,
@@ -71,7 +73,8 @@ class ProfilingBegin extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ProfilingQuestions(),
+                            builder: (_) =>
+                                ProfilingResultPage(persona: persona),
                           ),
                         );
                       },
@@ -83,7 +86,7 @@ class ProfilingBegin extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'I’m Ready to Take the Test!',
+                        'Calculating Your Result',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

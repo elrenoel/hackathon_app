@@ -21,6 +21,7 @@ dependencies:
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.5
   permission_handler: ^11.3.0
+  rename: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -35,12 +36,13 @@ flutter:
     - assets/icons/mood2.png
     - assets/images/
     - assets/images/profiling.png
+    - assets/images/9.png
     - assets/lottie/
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/duck.jpg"
-  adaptive_icon_foreground: "assets/images/duck.jpg"
+  image_path: "assets/icons/neura_logo.png"
+  adaptive_icon_foreground: "assets/icons/neura_logo.png"
   adaptive_icon_background: "#FFFFFF"
 
