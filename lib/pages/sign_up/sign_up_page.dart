@@ -91,10 +91,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             context,
                           ),
                           anotherSingUpButtton(
-                            Image.network(
-                              'https://img.icons8.com/?size=100&id=17949&format=png&color=000000',
-                              height: 30,
-                            ),
+                            Image.asset('assets/icons/google.png', height: 30),
                             'Continue with Google',
                             context,
                           ),

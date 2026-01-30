@@ -7,6 +7,13 @@ class AuthService {
   // static const String baseUrl = "http://192.168.18.19:8000";
   // kalau HP fisik → ganti IP laptop
 
+  static const _tokenKey = 'access_token';
+
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
   static Map<String, String> _headers() => {'Content-Type': 'application/json'};
 
   /// ================================
@@ -73,7 +80,13 @@ class AuthService {
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('access_token', data['access_token']);
+        await prefs.setString('token_type', data['token_type']);
+
         return null;
       }
 
@@ -131,23 +144,53 @@ class AuthService {
   }
 
   static Future<Map<String, dynamic>?> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("access_token");
-    if (token == null) return null;
+    try {
+      final token = await getToken();
+      if (token == null) return null;
 
-    final response = await http.get(
-      Uri.parse("$baseUrl/protected"),
-      headers: {"Authorization": "Bearer $token"},
-    );
+      final response = await http.get(
+        Uri.parse('$baseUrl/auth/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+
+      return null;
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove("access_token");
+  static Future<String?> submitProfiling({
+    required List<Map<String, int>> answers,
+  }) async {
+    try {
+      final token = await getToken();
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/profiling'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'answers': answers}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['persona']; // 🔥 INI KUNCI
+      }
+
+      return null;
+    } catch (e) {
+      // ignore: avoid_print
+      print('ERROR: $e');
+      return null;
+    }
   }
 }

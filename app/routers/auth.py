@@ -80,7 +80,7 @@ def verify_otp(
 # =========================
 # SET PASSWORD
 # =========================
-@router.post("/register/set-password", status_code=201)
+@router.post("/register/set-password", response_model=schemas.Token)
 def set_password(
     payload: schemas.SetPasswordRequest,
     db: Session = Depends(database.get_db)
@@ -104,8 +104,15 @@ def set_password(
     db.commit()
     db.refresh(user)
 
-    return {"message": "Account created"}
+    # 🔥 AUTO LOGIN
+    access_token = oauth2.create_access_token(
+        data={"user_id": user.id}
+    )
 
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 # =========================
 # LOGIN
@@ -129,3 +136,44 @@ def login(
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/profiling")
+def submit_profiling(
+    payload: schemas.ProfilingSubmit,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(oauth2.get_current_user),
+):
+    print(payload)
+
+    answer_indexes = [a.answer_index for a in payload.answers]
+
+    persona = utils.calculate_persona(answer_indexes)
+
+    current_user.persona = persona
+    current_user.profiling_completed = True
+    current_user.focus_score = sum(
+        2 if a == 0 else 1 if a == 1 else 0
+        for a in answer_indexes
+    )
+
+    db.commit()
+
+    return {
+        "persona": persona,
+        "score": current_user.focus_score,
+    }
+
+
+
+@router.get("/me")
+def get_me(
+    current_user: models.User = Depends(oauth2.get_current_user)
+):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "name": current_user.name,
+        "persona": current_user.persona,
+        "profiling_completed": current_user.profiling_completed,
+    }

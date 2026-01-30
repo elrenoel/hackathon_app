@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
@@ -103,3 +104,28 @@ class TodoResponse(BaseModel):
     class Config:
         orm_mode = True
 
+
+# Profilling User
+
+class ProfilingRequest(BaseModel):
+    q1: int = Field(ge=1, le=3)
+    q2: int = Field(ge=1, le=3)
+    q3: int = Field(ge=1, le=3)
+    q4: int = Field(ge=1, le=3)
+    q5: int = Field(ge=1, le=3)
+
+class ProfilingResponse(BaseModel):
+    persona: str
+    total_score: int
+
+class ProfilingAnswer(BaseModel):
+    question: int
+    answer_index: int  # 0,1,2
+
+
+class ProfilingSubmit(BaseModel):
+    answers: List[ProfilingAnswer]
+
+class ProfilingResultResponse(BaseModel):
+    persona: str
+    score: int

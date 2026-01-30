@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, DateTime, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -18,12 +19,35 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=True)  # ⬅️ belum ada di awal
-    name = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     is_verified = Column(Boolean, default=False)
 
-    todos = relationship("Todo", back_populates="owner")
+    persona = Column(String, nullable=True)
+    profiling_completed = Column(Boolean, default=False)
+    focus_score = Column(Integer, nullable=True)
+    
+    todos = relationship("Todo", back_populates="user", cascade="all, delete")
 
+
+class UserProfiling(Base):
+    __tablename__ = "user_profilings"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+
+    q1 = Column(Integer)
+    q2 = Column(Integer)
+    q3 = Column(Integer)
+    q4 = Column(Integer)
+    q5 = Column(Integer)
+
+    total_score = Column(Integer)
+    persona = Column(String)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
 
 
 class Todo(Base):
@@ -38,7 +62,7 @@ class Todo(Base):
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
-    owner = relationship("User", back_populates="todos")
+    user = relationship("User", back_populates="todos")
 
     # 🔥 1 todo → banyak subtask
     subtasks = relationship(
