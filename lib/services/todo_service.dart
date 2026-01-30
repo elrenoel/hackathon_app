@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoService {
-  static const String baseUrl = "http://192.168.18.19:8000";
+  // static const String baseUrl = "http://192.168.18.19:8000";
+  static const String baseUrl = "http://127.0.0.1:8000";
 
   /// GET todos
   static Future<List<Map<String, dynamic>>> fetchTodos() async {

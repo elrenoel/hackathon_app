@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  // static const String baseUrl = "http://localhost:8000";
-  static const String baseUrl = "http://192.168.18.19:8000";
+  static const String baseUrl = "http://localhost:8000";
+  // static const String baseUrl = "http://192.168.18.19:8000";
   // kalau HP fisik → ganti IP laptop
 
   static Map<String, String> _headers() => {'Content-Type': 'application/json'};
