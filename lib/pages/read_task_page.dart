@@ -3,8 +3,9 @@ import 'package:hackathon_app/models/article.dart';
 import 'package:hackathon_app/models/article_meta.dart';
 import 'package:hackathon_app/services/article_service.dart';
 import 'dart:async';
-import 'package:hackathon_app/services/reading_progress_service.dart';
+// import 'package:hackathon_app/services/reading_progress_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hackathon_app/pages/question_page.dart';
 
 class ReadTaskPage extends StatefulWidget {
   final ArticleMeta articleMeta;
@@ -190,29 +191,51 @@ class _ReadTaskPageState extends State<ReadTaskPage> {
               ),
 
               Positioned(
-                right: 20,
-                bottom: 20,
+                left: 0,
+                right: 0,
+                bottom: 0,
                 child: ValueListenableBuilder<double>(
                   valueListenable: scrollPercent,
                   builder: (_, value, __) {
                     if (value < 85) return const SizedBox.shrink();
 
-                    return ElevatedButton(
-                      onPressed: () {
-                        ReadingProgressService.addReadingSession(
-                          minutes: widget.articleMeta.duration,
-                        );
-
-                        Navigator.pop(context); // balik ke DeepRead
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                    return Container(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, -4),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        'Finish Reading',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyLarge?.copyWith(color: Colors.white),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const QuestionPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF7C4DFF), // ungu
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Finish Reading',
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(color: Colors.white),
+                          ),
+                        ),
                       ),
                     );
                   },

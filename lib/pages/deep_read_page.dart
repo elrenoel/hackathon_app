@@ -5,13 +5,10 @@ import 'package:hackathon_app/models/article_meta.dart';
 import 'package:hackathon_app/services/reading_progress_service.dart';
 import 'dart:math';
 import 'package:hackathon_app/services/auth_service.dart';
-// import 'package:hackathon_app/services/mood_service.dart';
-// import 'package:hackathon_app/utils/show_mood_checkin.dart';
-// import 'package:hackathon_app/widgets/home_page_widget/daily_check_in_emotion.dart';
 
 class DeepReadPage extends StatefulWidget {
-  // final String mood;
   const DeepReadPage({super.key});
+
   @override
   State<DeepReadPage> createState() => _DeepReadPageState();
 }
@@ -20,9 +17,7 @@ class _DeepReadPageState extends State<DeepReadPage> {
   Map<String, dynamic>? _user;
   bool _loadingUser = true;
 
-  List<ArticleMeta> get articles {
-    return getDefaultArticles();
-  }
+  List<ArticleMeta> get articles => getDefaultArticles();
 
   final List<String> _focusOpeners = [
     'Fokusmu hari ini cukup seimbang.',
@@ -41,15 +36,6 @@ class _DeepReadPageState extends State<DeepReadPage> {
     'Fokus pada kualitas, bukan jumlah.',
     'Biarkan pikiran bekerja dengan ritmenya sendiri.',
   ];
-  String generateFocusDescription() {
-    final random = Random();
-
-    final opener = _focusOpeners[random.nextInt(_focusOpeners.length)];
-    final direction = _focusDirections[random.nextInt(_focusDirections.length)];
-    final closing = _focusClosings[random.nextInt(_focusClosings.length)];
-
-    return '$opener $direction $closing';
-  }
 
   final List<String> motivationalQuotes = [
     'Pelan itu bukan lambat, tapi sadar.',
@@ -60,32 +46,42 @@ class _DeepReadPageState extends State<DeepReadPage> {
     'Otakmu tidak lelah, hanya butuh ritme.',
     'Sedikit demi sedikit tetap progres.',
   ];
+
   late String currentQuote;
   late String focusDescription;
+
   String get focusType => 'Balanced Focus';
+
   final int targetMinutes = 30;
   final int targetArticles = 3;
   final int targetQuestions = 10;
+
   int get progressMinutes => ReadingProgressService.minutesReadToday;
   int get progressArticles => ReadingProgressService.articlesReadToday;
   bool get isArticleTargetReached => progressArticles >= targetArticles;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+    focusDescription = _generateFocusDescription();
+    _generateRandomQuote();
+  }
+
   Future<void> _fetchUser() async {
     final user = await AuthService.getCurrentUser();
-
     if (!mounted) return;
-
     setState(() {
       _user = user;
       _loadingUser = false;
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchUser();
-    focusDescription = generateFocusDescription();
-    _generateRandomQuote();
+  String _generateFocusDescription() {
+    final random = Random();
+    return '${_focusOpeners[random.nextInt(_focusOpeners.length)]} '
+        '${_focusDirections[random.nextInt(_focusDirections.length)]} '
+        '${_focusClosings[random.nextInt(_focusClosings.length)]}';
   }
 
   void _generateRandomQuote() {
@@ -99,61 +95,53 @@ class _DeepReadPageState extends State<DeepReadPage> {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
-        padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
+        padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ================= HEADER =================
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 70,
-                  height: 70,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(999),
+                    shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        offset: Offset(1, 1),
+                        offset: const Offset(1, 1),
                         blurRadius: 3,
-                        // ignore: deprecated_member_use
                         color: Colors.black.withOpacity(0.15),
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
+                  child: ClipOval(
                     child: Image.asset(
                       'assets/icons/bro.jpg',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         _loadingUser
-                            ? "Loading..."
-                            : "${_user?['name'] ?? 'User'}, $focusType!",
+                            ? 'Loading...'
+                            : '${_user?['name'] ?? 'User'}, $focusType!',
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
-
-                      SizedBox(height: 5),
-
+                      const SizedBox(height: 6),
                       Container(
-                        width: double.infinity,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              offset: const Offset(1, 1),
                               blurRadius: 6,
-                              // ignore: deprecated_member_use
                               color: Colors.black.withOpacity(0.15),
                             ),
                           ],
@@ -171,190 +159,166 @@ class _DeepReadPageState extends State<DeepReadPage> {
               ],
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Today's Target (${focusType})",
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
+            // ================= READING ACTIVITY =================
+            Text(
+              'Reading Activity',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: 12),
 
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 3,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.1,
-                  ),
-                  itemBuilder: (_, index) {
-                    return _TargetItem(
-                      icon: [
-                        Icons.timer,
-                        Icons.book,
-                        Icons.question_mark_sharp,
-                      ][index],
-                      // title: ["45 menit", "5 artikel", "15 soal"][index],
-                      title: [
-                        "$targetMinutes menit",
-                        "$targetArticles artikel",
-                        "$targetQuestions soal",
-                      ][index],
-                    );
-                  },
-                ),
+            _ReadingActivityItem(
+              icon: Icons.timer,
+              title: 'Minutes',
+              target: '$targetMinutes minutes',
+              completed: '$progressMinutes minutes',
+            ),
+            const SizedBox(height: 10),
 
-                const SizedBox(height: 20),
+            _ReadingActivityItem(
+              icon: Icons.book,
+              title: 'Articles',
+              target: '$targetArticles articles',
+              completed: '$progressArticles articles',
+            ),
+            const SizedBox(height: 10),
 
-                Text(
-                  "Today's Progress",
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 3,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.1,
-                  ),
-                  itemBuilder: (_, index) {
-                    return _TargetItem(
-                      icon: [
-                        Icons.timer,
-                        Icons.book,
-                        Icons.question_mark_sharp,
-                      ][index],
-                      title: [
-                        "${ReadingProgressService.minutesReadToday} menit",
-                        "${ReadingProgressService.articlesReadToday} artikel",
-                        "-",
-                      ][index],
-                    );
-                  },
-                ),
-              ],
+            _ReadingActivityItem(
+              icon: Icons.question_mark,
+              title: 'Questions',
+              target: '$targetQuestions questions',
+              completed:
+                  '${ReadingProgressService.questionsAnsweredToday} questions',
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 16),
 
+            // ================= MOTIVATION =================
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    offset: const Offset(1, 1),
                     blurRadius: 6,
-                    // ignore: deprecated_member_use
                     color: Colors.black.withOpacity(0.15),
                   ),
                 ],
               ),
               child: Text(
                 currentQuote,
-                style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Article Recommendation',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 10),
+            // ================= ARTICLE RECOMMENDATION =================
+            Text(
+              'Article Recommendation',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: 12),
 
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: articles.length,
-                  itemBuilder: (context, index) {
-                    final article = articles[index];
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: articles.length,
+              itemBuilder: (context, index) {
+                final article = articles[index];
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
+                return Column(
+                  children: [
+                    Container(
                       padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            offset: const Offset(1, 1),
                             blurRadius: 6,
-                            color: Colors.black.withOpacity(0.15),
+                            color: Colors.black.withOpacity(0.12),
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text(
-                            article.title,
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            article.description,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Text('⏱ ${article.duration} min'),
-                              const Spacer(),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.play_arrow,
-                                  color: isArticleTargetReached
-                                      ? Colors.grey
-                                      : Colors.black,
-                                ),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          ReadTaskPage(articleMeta: article),
-                                    ),
-                                  );
-                                  setState(() {
-                                    focusDescription =
-                                        generateFocusDescription();
-                                    _generateRandomQuote();
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          if (isArticleTargetReached)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                'Daily article target reached',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: Colors.grey),
-                              ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              article.thumbnail,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
                             ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  article.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Estimated reading time: ${article.duration} minutes',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.black54),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.play_arrow,
+                              color: isArticleTargetReached
+                                  ? Colors.grey
+                                  : Colors.deepPurple,
+                            ),
+                            onPressed: isArticleTargetReached
+                                ? null
+                                : () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ReadTaskPage(articleMeta: article),
+                                      ),
+                                    );
+                                    setState(() {
+                                      focusDescription =
+                                          _generateFocusDescription();
+                                      _generateRandomQuote();
+                                    });
+                                  },
+                          ),
                         ],
                       ),
-                    );
-                  },
-                ),
-              ],
+                    ),
+                    if (isArticleTargetReached)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          'Daily article target reached',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -363,38 +327,56 @@ class _DeepReadPageState extends State<DeepReadPage> {
   }
 }
 
-class _TargetItem extends StatelessWidget {
+// ================= ACTIVITY ITEM =================
+class _ReadingActivityItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String target;
+  final String completed;
 
-  const _TargetItem({required this.icon, required this.title});
+  const _ReadingActivityItem({
+    required this.icon,
+    required this.title,
+    required this.target,
+    required this.completed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
-          BoxShadow(
-            offset: const Offset(1, 1),
-            blurRadius: 6,
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.15),
-          ),
+          BoxShadow(blurRadius: 6, color: Colors.black.withOpacity(0.12)),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Icon(icon, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          Icon(icon, size: 28, color: Colors.deepPurple),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.labelMedium),
+                const SizedBox(height: 4),
+                Text(
+                  'Target: $target',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Text(
+                  'Completed: $completed',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: completed.startsWith('0')
+                        ? Colors.black54
+                        : Colors.deepPurple,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

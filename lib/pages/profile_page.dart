@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hackathon_app/pages/change_password_page.dart';
+import 'package:hackathon_app/pages/edit_profile_page.dart';
+import 'package:hackathon_app/pages/help_page.dart';
+import 'package:hackathon_app/pages/settings_page.dart';
 import 'package:hackathon_app/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hackathon_app/pages/welcome_page.dart';
@@ -110,15 +114,49 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                _ProfileMenuItem(icon: Icons.edit, title: 'Edit Profile'),
+                _ProfileMenuItem(
+                  icon: Icons.edit,
+                  title: 'Edit Profile',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const EditProfilePage(),
+                      ),
+                    );
+                  },
+                ),
                 _ProfileMenuItem(
                   icon: Icons.lock_outline,
                   title: 'Change Password',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ChangePasswordPage(),
+                      ),
+                    );
+                  },
                 ),
-                _ProfileMenuItem(icon: Icons.help_outline, title: 'Help'),
+                _ProfileMenuItem(
+                  icon: Icons.help_outline,
+                  title: 'Help',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HelpPage()),
+                    );
+                  },
+                ),
                 _ProfileMenuItem(
                   icon: Icons.settings_outlined,
                   title: 'Settings',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    );
+                  },
                 ),
                 _ProfileMenuItem(
                   icon: Icons.logout,

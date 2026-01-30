@@ -17,6 +17,7 @@ final List<ArticleMeta> allArticles = [
     description: 'Cara masuk ke kondisi fokus maksimal tanpa distraksi.',
     duration: 15,
     moods: ['Happy'],
+    thumbnail: 'assets/icons/medium.jpg',
     sourceUrl:
         'https://medium.com/language-lab/how-to-learn-multiple-languages-at-the-same-time-005fb66f46a7',
     paragraphs: [
@@ -30,6 +31,7 @@ final List<ArticleMeta> allArticles = [
     description: 'Memanfaatkan mood positif untuk produktivitas.',
     duration: 20,
     moods: ['Happy'],
+    thumbnail: 'assets/icons/medium.jpg',
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -39,6 +41,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Kenapa fokus panjang itu skill langka.',
     duration: 25,
     moods: ['Happy'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -50,6 +54,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Bacaan ringan saat energi menurun.',
     duration: 10,
     moods: ['Tired'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -59,6 +65,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Cara membaca tanpa bikin tambah capek.',
     duration: 12,
     moods: ['Tired'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -68,6 +76,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Fokus singkat tapi efektif.',
     duration: 8,
     moods: ['Tired'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -79,6 +89,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Menurunkan stres lewat bacaan reflektif.',
     duration: 15,
     moods: ['Stress'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
@@ -89,6 +101,8 @@ final List<ArticleMeta> allArticles = [
     duration: 18,
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     moods: ['Stress'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
   ),
   ArticleMeta(
@@ -96,6 +110,8 @@ final List<ArticleMeta> allArticles = [
     title: 'Slow Reading Practice',
     description: 'Membaca pelan untuk menenangkan pikiran.',
     duration: 20,
+    thumbnail: 'assets/icons/medium.jpg',
+
     moods: ['Stress'],
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Flow State for Deep Focus'),
@@ -106,6 +122,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Bagaimana fokus mengalahkan bakat di era distraksi.',
     duration: 12,
     moods: ['Balanced'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/focus-superpower',
     paragraphs: dummyParagraphs('Deep Work in a Shallow World'),
   ),
@@ -115,6 +133,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Strategi bertahan dari notifikasi & dopamine trap.',
     duration: 15,
     moods: ['Balanced'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/deep-work-shallow-world',
     paragraphs: dummyParagraphs('Deep Work in a Shallow World'),
   ),
@@ -124,6 +144,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Kenapa membaca pelan justru bikin lebih paham.',
     duration: 10,
     moods: ['Balanced'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/slow-reading',
     paragraphs: dummyParagraphs('Deep Work in a Shallow World'),
   ),
@@ -133,6 +155,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Apa yang sebenarnya bikin otak capek.',
     duration: 8,
     moods: ['Balanced'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/mental-fatigue',
     paragraphs: dummyParagraphs('Deep Work in a Shallow World'),
   ),
@@ -142,6 +166,8 @@ final List<ArticleMeta> allArticles = [
     description: 'Cara bikin baca jadi kebiasaan tanpa maksa.',
     duration: 14,
     moods: ['Balanced'],
+    thumbnail: 'assets/icons/medium.jpg',
+
     sourceUrl: 'https://medium.com/@username/daily-reading-habit',
     paragraphs: dummyParagraphs('Deep Work in a Shallow World'),
   ),

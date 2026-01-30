@@ -6,14 +6,15 @@ import 'pages/profile_page.dart';
 import 'widgets/custom_bottom_navbar.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  final int initialIndex;
+  const MainApp({super.key, this.initialIndex = 0});
 
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   // final List<Widget> _pages = const [
   //   HomePage(),
@@ -32,6 +33,9 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
+
+    _currentIndex = widget.initialIndex;
+
     _pages = [
       HomePage(onMoodSubmitted: switchToDeepRead),
       const DeepReadPage(),

@@ -6,7 +6,7 @@ class ArticleMeta {
   final List<String> moods;
   final List<String> paragraphs;
   final String sourceUrl;
-
+  final String thumbnail; // logo / image
   ArticleMeta({
     required this.id,
     required this.title,
@@ -15,5 +15,6 @@ class ArticleMeta {
     required this.moods,
     required this.paragraphs,
     required this.sourceUrl,
+    required this.thumbnail,
   });
 }
