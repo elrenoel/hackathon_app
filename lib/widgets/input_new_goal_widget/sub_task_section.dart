@@ -24,7 +24,6 @@ class _SubTaskSectionState extends State<SubTaskSection> {
       _controller.clear();
     });
 
-    // 🔥 INI YANG KAMU KURANG
     widget.onChanged(List<SubTask>.from(_subTasks));
   }
 
@@ -33,7 +32,6 @@ class _SubTaskSectionState extends State<SubTaskSection> {
       _subTasks.remove(task);
     });
 
-    // 🔥 WAJIB JUGA DI REMOVE
     widget.onChanged(List<SubTask>.from(_subTasks));
   }
 

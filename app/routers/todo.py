@@ -5,38 +5,60 @@ from app import models
 from app import schemas
 from app.database import get_db
 from app import oauth2
+from sqlalchemy.orm import Session, selectinload
+
 
 router = APIRouter(prefix="/todos", tags=["Todos"])
 
-@router.post("/todos", response_model=schemas.TodoResponse)
+@router.post("/", response_model=schemas.TodoResponse)
 def create_todo(
     todo: schemas.TodoCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(oauth2.get_current_user)
+    current_user = Depends(oauth2.get_current_user),
 ):
     new_todo = models.Todo(
-      title=todo.title,
-      duration=todo.duration,
-      start_time=todo.start_time,
-      reminder=todo.reminder,
-      user_id=current_user.id
+        title=todo.title,
+        duration=todo.duration,
+        start_time=todo.start_time,
+        reminder=todo.reminder,
+        user_id=current_user.id,
     )
+
+    # 🔥 add subtasks
+    for sub in todo.subtasks:
+        new_todo.subtasks.append(
+            models.Subtask(title=sub.title)
+        )
+
     db.add(new_todo)
     db.commit()
     db.refresh(new_todo)
+
     return new_todo
 
+from sqlalchemy.orm import Session, selectinload
 
-@router.get("/todos", response_model=list[schemas.TodoResponse])
+@router.get("/", response_model=list[schemas.TodoResponse])
 def get_my_todos(
     db: Session = Depends(get_db),
-    current_user = Depends(oauth2.get_current_user)
+    current_user = Depends(oauth2.get_current_user),
 ):
-    return db.query(models.Todo)\
-        .filter(models.Todo.user_id == current_user.id)\
+    todos = (
+        db.query(models.Todo)
+        .options(selectinload(models.Todo.subtasks))
+        .filter(models.Todo.user_id == current_user.id)
         .all()
+    )
 
-@router.patch("/todos/{todo_id}", response_model=schemas.TodoResponse)
+    # 🔥 DEBUG — HAPUS SETELAH SELESAI
+    if todos:
+        print("DEBUG SUBTASKS:", todos[0].subtasks)
+
+    return todos
+
+
+
+@router.patch("/{todo_id}", response_model=schemas.TodoResponse)
 def toggle_todo_done(
     todo_id: int,
     db: Session = Depends(get_db),
@@ -60,7 +82,7 @@ def toggle_todo_done(
 
     return todo
 
-@router.delete("/todos/{todo_id}", status_code=204)
+@router.delete("/{todo_id}", status_code=204)
 def delete_todo(
     todo_id: int,
     db: Session = Depends(get_db),
@@ -80,3 +102,33 @@ def delete_todo(
 
     db.delete(todo)
     db.commit()
+
+@router.post("/{todo_id}/subtasks", response_model=schemas.SubtaskBase)
+def create_subtask(
+    todo_id: int,
+    subtask: schemas.SubtaskCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(oauth2.get_current_user),
+):
+    todo = (
+        db.query(models.Todo)
+        .filter(
+            models.Todo.id == todo_id,
+            models.Todo.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    new_subtask = models.Subtask(
+        title=subtask.title,
+        todo_id=todo.id,
+    )
+
+    db.add(new_subtask)
+    db.commit()
+    db.refresh(new_subtask)
+
+    return new_subtask

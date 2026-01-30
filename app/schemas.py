@@ -1,12 +1,60 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
+# =======================
+# SUBTASK SCHEMAS (NAIK KE ATAS)
+# =======================
+
+class SubtaskBase(BaseModel):
+    id: int
+    title: str
+    is_done: bool
+    todo_id: int
+
+    class Config:
+        orm_mode = True
+
+class SubtaskCreate(BaseModel):
+    title: str
+
+class SubtaskResponse(BaseModel):
+    id: int
+    title: str
+    is_done: bool
+
+    class Config:
+        orm_mode = True
+        
+# OTP Schema
+
+class SendOTPRequest(BaseModel):
+    email: EmailStr
+    name: str
+
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class SetPasswordRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+
+
+
+# =======================
+# USER SCHEMAS
+# =======================
+
 class UserBase(BaseModel):
     email: EmailStr
     name: str
 
+
 class UserCreate(UserBase):
     password: str = Field(min_length=6)
+
     @field_validator("password")
     @classmethod
     def password_max_72_bytes(cls, v: str):
@@ -14,22 +62,31 @@ class UserCreate(UserBase):
             raise ValueError("Password too long (max 72 bytes)")
         return v
 
+
 class UserResponse(UserBase):
     id: int
     email: EmailStr
     name: str
+
     class Config:
         from_attributes = True
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+# =======================
+# TODO SCHEMAS
+# =======================
 
 class TodoCreate(BaseModel):
     title: str
     duration: str | None = None
     start_time: str | None = None
     reminder: str | None = None
+    subtasks: list[SubtaskCreate] = []  # ✅ sekarang sudah dikenal
 
 
 class TodoResponse(BaseModel):
@@ -40,5 +97,9 @@ class TodoResponse(BaseModel):
     reminder: str | None
     is_done: bool
 
+    # 🔥 INI KUNCI
+    subtasks: list[SubtaskResponse] = []
+
     class Config:
-        from_attributes = True
+        orm_mode = True
+

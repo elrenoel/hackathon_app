@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 # GANTI sesuai DB lu
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:ayamgoreng@localhost/flutter"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:ayamgoreng@localhost/Flutter"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 # engine.connect()

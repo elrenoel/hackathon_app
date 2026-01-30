@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
+import 'package:hackathon_app/models/focus_session_payload.dart';
+import 'package:hackathon_app/models/sub_task.dart';
 import 'package:hackathon_app/pages/input_goal_page.dart';
+import 'package:hackathon_app/pages/timer_focus_session_page.dart';
 import 'package:hackathon_app/services/todo_service.dart';
 
 class GoalsToday extends StatefulWidget {
@@ -24,6 +27,10 @@ class _GoalsTodayState extends State<GoalsToday> {
 
   //AMBIL
   Future<void> _loadGoals() async {
+    setState(() {
+      _loading = true;
+    });
+
     final todos = await TodoService.fetchTodos();
 
     if (!mounted) return;
@@ -33,17 +40,21 @@ class _GoalsTodayState extends State<GoalsToday> {
         return Task(
           id: todo['id'],
           title: todo['title'],
-          durationTime: todo['duration'] ?? "25 min",
+          durationTime: todo['duration'] ?? '25 min',
           startTime: DateTime.parse(
             todo['start_time'] ?? DateTime.now().toIso8601String(),
           ),
           reminder: todo['reminder'] ?? '',
           goalsDone: todo['is_done'] ?? false,
-          subTasks: [],
+          subTasks: (todo['subtasks'] as List? ?? [])
+              .map((s) => SubTask.fromJson(s))
+              .toList(),
         );
       }).toList();
 
-      _loading = false;
+      print("GOALS LENGTH: ${goals.length}");
+
+      _loading = false; // 🔥 INI KUNCI
     });
   }
 
@@ -54,6 +65,40 @@ class _GoalsTodayState extends State<GoalsToday> {
   double get progress {
     if (totalTodos == 0) return 0;
     return doneTodos / totalTodos;
+  }
+
+  Duration _parseDuration(String value) {
+    final text = value.toLowerCase();
+
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+
+    final hourMatch = RegExp(r'(\d+)\s*(jam|hour|hours|h)').firstMatch(text);
+    if (hourMatch != null) {
+      hours = int.parse(hourMatch.group(1)!);
+    }
+
+    final minuteMatch = RegExp(
+      r'(\d+)\s*(menit|min|minutes|m)',
+    ).firstMatch(text);
+    if (minuteMatch != null) {
+      minutes = int.parse(minuteMatch.group(1)!);
+    }
+
+    final secondMatch = RegExp(
+      r'(\d+)\s*(detik|sec|seconds|s)',
+    ).firstMatch(text);
+    if (secondMatch != null) {
+      seconds = int.parse(secondMatch.group(1)!);
+    }
+
+    // fallback default
+    if (hours == 0 && minutes == 0 && seconds == 0) {
+      minutes = 25;
+    }
+
+    return Duration(hours: hours, minutes: minutes, seconds: seconds);
   }
 
   @override
@@ -113,201 +158,122 @@ class _GoalsTodayState extends State<GoalsToday> {
               itemBuilder: (context, index) {
                 final task = goals[index];
 
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: !task.goalsDone
-                          ? AppColors.violet300
-                          : AppColors.green,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: !task.goalsDone
+                            ? AppColors.violet300
+                            : AppColors.green,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 20,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            task.title,
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            spacing: 2,
-                            children: [
-                              Icon(Icons.timer_outlined),
-                              Text(
-                                task.durationTime,
-                                style: Theme.of(context).textTheme.labelSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Row(
-                          children: [
-                            // 🗑 DELETE
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Color.fromARGB(255, 75, 75, 75),
-                              ),
-                              onPressed: () async {
-                                final confirm = await showDialog<bool>(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: const Text("Delete todo?"),
-                                    content: const Text(
-                                      "This action cannot be undone",
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 4,
+                              children: [
+                                Text(
+                                  task.title,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                Row(
+                                  spacing: 2,
+                                  children: [
+                                    Icon(Icons.timer_outlined, size: 16),
+                                    Text(
+                                      task.durationTime,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelSmall,
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        child: const Text("Cancel"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        child: const Text("Delete"),
-                                      ),
-                                    ],
-                                  ),
-                                );
-
-                                if (confirm == true) {
-                                  final success = await TodoService.deleteTodo(
-                                    task.id,
-                                  );
-                                  if (success) _loadGoals();
-                                }
-                              },
+                                  ],
+                                ),
+                              ],
                             ),
+                          ),
 
-                            // ✅ TOGGLE DONE
-                            InkWell(
-                              onTap: () async {
-                                final success = await TodoService.toggleTodo(
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Color.fromARGB(255, 75, 75, 75),
+                            ),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text("Delete todo?"),
+                                  content: const Text(
+                                    "This action cannot be undone",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm == true) {
+                                final success = await TodoService.deleteTodo(
                                   task.id,
                                 );
                                 if (success) _loadGoals();
-                              },
-                              child: Text(
-                                task.goalsDone ? 'Done' : 'Focus Now',
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: task.goalsDone
-                                          ? AppColors.green
-                                          : AppColors.violet300,
+                              }
+                            },
+                          ),
+
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TimerFocusSessionPage(
+                                    payload: FocusSessionPayload(
+                                      taskTitle: task.title,
+                                      duration: _parseDuration(
+                                        task.durationTime,
+                                      ),
+                                      subtasks: task.subTasks
+                                          .map((e) => e.title)
+                                          .toList(),
+                                      needPermission: false,
+                                      source: FocusSource.todo,
                                     ),
-                              ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              task.goalsDone ? 'Done' : 'Focus Now',
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: task.goalsDone
+                                        ? AppColors.green
+                                        : AppColors.violet300,
+                                  ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
               },
             ),
-          // const SizedBox(height: 10),
-          // if (_loading)
-          //   const Padding(
-          //     padding: EdgeInsets.all(16),
-          //     child: CircularProgressIndicator(),
-          //   )
-          // else
-          //   ListView.builder(
-          //     shrinkWrap: true,
-          //     physics: const NeverScrollableScrollPhysics(),
-          //     itemCount: goals.length,
-          //     itemBuilder: (context, index) {
-          //       final task = goals[index];
-
-          //       return Card(
-          //         child: Padding(
-          //           padding: const EdgeInsets.all(12),
-          //           child: Row(
-          //             crossAxisAlignment: CrossAxisAlignment.center,
-          //             children: [
-          //               Expanded(child: Text(task.title)),
-          //               Expanded(child: Text(task.durationTime)),
-
-          //               Row(
-          //                 children: [
-          //                   // 🗑️ DELETE
-          //                   IconButton(
-          //                     icon: const Icon(Icons.delete, color: Colors.red),
-          //                     onPressed: () async {
-          //                       final confirm = await showDialog<bool>(
-          //                         context: context,
-          //                         builder: (_) => AlertDialog(
-          //                           title: const Text("Delete todo?"),
-          //                           content: const Text(
-          //                             "This action cannot be undone",
-          //                           ),
-          //                           actions: [
-          //                             TextButton(
-          //                               onPressed: () =>
-          //                                   Navigator.pop(context, false),
-          //                               child: const Text("Cancel"),
-          //                             ),
-          //                             TextButton(
-          //                               onPressed: () =>
-          //                                   Navigator.pop(context, true),
-          //                               child: const Text("Delete"),
-          //                             ),
-          //                           ],
-          //                         ),
-          //                       );
-
-          //                       if (confirm == true) {
-          //                         final success = await TodoService.deleteTodo(
-          //                           task.id,
-          //                         );
-          //                         if (success) _loadGoals();
-          //                       }
-          //                     },
-          //                   ),
-          //                   // ✅ TOGGLE DONE / FOCUS
-          //                   InkWell(
-          //                     onTap: () async {
-          //                       print('CLICKED TODO ID: ${task.id}');
-          //                       final success = await TodoService.toggleTodo(
-          //                         task.id,
-          //                       );
-          //                       if (success) {
-          //                         _loadGoals();
-          //                       }
-          //                     },
-          //                     child: Row(
-          //                       children: [
-          //                         Text(task.goalsDone ? 'Done' : 'Focus Now'),
-          //                         const SizedBox(width: 6),
-          //                         Icon(
-          //                           task.goalsDone
-          //                               ? Icons.check_circle
-          //                               : Icons.arrow_forward_ios,
-          //                           size: 16,
-          //                           color: task.goalsDone
-          //                               ? Colors.green
-          //                               : Colors.black,
-          //                         ),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
         ],
       ),
     );

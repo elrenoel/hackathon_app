@@ -3,9 +3,86 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = "http://localhost:8000";
-  // static const String baseUrl = "http://192.168.1.4:8000";
+  // static const String baseUrl = "http://localhost:8000";
+  static const String baseUrl = "http://192.168.18.19:8000";
   // kalau HP fisik → ganti IP laptop
+
+  static Map<String, String> _headers() => {'Content-Type': 'application/json'};
+
+  /// ================================
+  /// STEP 1 — SEND OTP (name + email)
+  /// ================================
+  static Future<String?> sendOtp({
+    required String name,
+    required String email,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register/send-otp'),
+        headers: _headers(),
+        body: jsonEncode({'name': name, 'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        return null;
+      }
+
+      final data = jsonDecode(response.body);
+      return data['detail'] ?? 'Failed to send OTP';
+    } catch (e) {
+      return 'Network error';
+    }
+  }
+
+  /// ================================
+  /// STEP 2 — VERIFY OTP
+  /// ================================
+  static Future<String?> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register/verify-otp'),
+        headers: _headers(),
+        body: jsonEncode({'email': email, 'otp': otp}),
+      );
+
+      if (response.statusCode == 200) {
+        return null;
+      }
+
+      final data = jsonDecode(response.body);
+      return data['detail'] ?? 'Invalid OTP';
+    } catch (e) {
+      return 'Network error';
+    }
+  }
+
+  /// ================================
+  /// STEP 3 — SET PASSWORD (FINAL)
+  /// ================================
+  static Future<String?> setPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register/set-password'),
+        headers: _headers(),
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      if (response.statusCode == 201) {
+        return null;
+      }
+
+      final data = jsonDecode(response.body);
+      return data['detail'] ?? 'Failed to create account';
+    } catch (e) {
+      return 'Network error';
+    }
+  }
 
   static Future<String?> register(
     String name,

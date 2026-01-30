@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_add_email.dart';
 import 'package:hackathon_app/pages/sign_up/sign_up_create_password.dart';
+import 'package:hackathon_app/services/auth_service.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpVerificationEmail extends StatefulWidget {
-  const SignUpVerificationEmail({super.key});
+  final String email;
+
+  const SignUpVerificationEmail({super.key, required this.email});
 
   @override
   State<SignUpVerificationEmail> createState() =>
@@ -15,9 +18,10 @@ class SignUpVerificationEmail extends StatefulWidget {
 
 class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
   final int codeLength = 6;
-  List<TextEditingController>? controllers;
-  List<FocusNode>? focusNodes;
-  String email = 'elreno@mail.com';
+  late List<TextEditingController> controllers;
+  late List<FocusNode> focusNodes;
+
+  bool _loading = false;
 
   @override
   void initState() {
@@ -28,13 +32,45 @@ class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
 
   @override
   void dispose() {
-    for (final c in controllers!) {
+    for (final c in controllers) {
       c.dispose();
     }
-    for (final f in focusNodes!) {
+    for (final f in focusNodes) {
       f.dispose();
     }
     super.dispose();
+  }
+
+  String get otp => controllers.map((c) => c.text).join();
+
+  Future<void> verifyOtp() async {
+    if (otp.length != 6) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('OTP harus 6 digit')));
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    final error = await AuthService.verifyOtp(email: widget.email, otp: otp);
+
+    if (!mounted) return;
+
+    setState(() => _loading = false);
+
+    if (error == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SignUpCreatePassword(email: widget.email),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
+    }
   }
 
   @override
@@ -42,9 +78,8 @@ class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
-        spacing: 17,
         children: [
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Row(
             children: [
               BackButton(color: AppColors.black5),
@@ -61,118 +96,88 @@ class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(
-                right: 16,
-                left: 16,
-                top: 10,
-                bottom: 32,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 10,
                 children: [
                   Text(
-                    'We just sent 5-digit code to\n $email, enter it bellow:',
+                    'We just sent 6-digit code to\n${widget.email}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  SizedBox(height: 10),
-                  Column(
-                    spacing: 10,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Code',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        spacing: 5,
-                        children: List.generate(codeLength, (index) {
-                          return Expanded(
-                            child: SizedBox(
-                              child: TextField(
-                                controller: controllers?[index],
-                                focusNode: focusNodes?[index],
-                                keyboardType: TextInputType.number,
-                                textAlign: TextAlign.center,
-                                maxLength: 1,
-                                style: Theme.of(context).textTheme.bodySmall,
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(
-                                      color: Colors.purple,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  if (value.isNotEmpty &&
-                                      index < codeLength - 1) {
-                                    focusNodes?[index + 1].requestFocus();
-                                  }
-                                  if (value.isEmpty && index > 0) {
-                                    focusNodes?[index - 1].requestFocus();
-                                  }
-                                },
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: List.generate(codeLength, (index) {
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: TextField(
+                            controller: controllers[index],
+                            focusNode: focusNodes[index],
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            maxLength: 1,
+                            decoration: InputDecoration(
+                              counterText: '',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                          );
-                        }),
-                      ),
-                    ],
+                            onChanged: (value) {
+                              if (value.isNotEmpty && index < codeLength - 1) {
+                                focusNodes[index + 1].requestFocus();
+                              } else if (value.isEmpty && index > 0) {
+                                focusNodes[index - 1].requestFocus();
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    }),
                   ),
-                  SizedBox(height: 5),
+
+                  const SizedBox(height: 20),
+
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignUpCreatePassword(),
-                          ),
-                        );
-                      },
+                      onPressed: _loading ? null : verifyOtp,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.violet400,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 18),
                       ),
-                      child: Text(
-                        'Verify email',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-                      ),
+                      child: _loading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Verify email',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.white),
+                            ),
                     ),
                   ),
+
+                  const SizedBox(height: 12),
+
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(color: Colors.black, fontSize: 14),
+                      style: Theme.of(context).textTheme.bodySmall,
                       children: [
-                        TextSpan(
-                          text: 'Wrong email?',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.black5),
-                        ),
+                        const TextSpan(text: 'Wrong email?'),
                         TextSpan(
                           text: ' Send to different email',
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: AppColors.black5),
+                              ?.copyWith(color: AppColors.violet400),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => SignUpAddEmail(),
+                                  builder: (_) => const SignUpAddEmail(),
                                 ),
                               );
                             },
@@ -180,7 +185,9 @@ class _SignUpVerificationEmailState extends State<SignUpVerificationEmail> {
                       ],
                     ),
                   ),
-                  Spacer(),
+
+                  const Spacer(),
+
                   Text(
                     'By using Neura, you agree to the \n Terms and Privacy Policy.',
                     style: Theme.of(context).textTheme.labelSmall,

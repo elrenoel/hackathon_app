@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
-import 'package:hackathon_app/main_app.dart';
-// import 'package:hackathon_app/pages/sign_up/sign_up_verification_email.dart';
-// import 'package:hackathon_app/widgets/sign_up_widget/step_indicator.dart';
+import 'package:hackathon_app/pages/sign_up/sign_up_verification_email.dart';
 import 'package:hackathon_app/services/auth_service.dart';
-// import 'package:hackathon_app/pages/home_page.dart';
 import 'package:hackathon_app/widgets/step_indicator.dart';
 
 class SignUpAddEmail extends StatefulWidget {
@@ -15,20 +12,31 @@ class SignUpAddEmail extends StatefulWidget {
 }
 
 class _SignUpAddEmailState extends State<SignUpAddEmail> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
 
-  void register() async {
-    final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> register() async {
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Name & email wajib diisi')));
+      return;
+    }
 
     setState(() => _loading = true);
 
-    final error = await AuthService.register(
-      _nameController.text.trim(),
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
+    final error = await AuthService.sendOtp(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
     );
 
     if (!mounted) return;
@@ -36,16 +44,20 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
     setState(() => _loading = false);
 
     if (error == null) {
-      navigator.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainApp()),
-        (route) => false,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              SignUpVerificationEmail(email: _emailController.text.trim()),
+        ),
       );
     } else {
-      messenger.showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
-  bool _loading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +65,7 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 BackButton(color: AppColors.black5),
@@ -65,83 +77,73 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
 
+            const SizedBox(height: 10),
             stepIndicator(1, 3),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             Expanded(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Full Name'),
-                      TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Your name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Full Name'),
+                    TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        hintText: 'Your name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 10),
+                    const SizedBox(height: 12),
 
-                      Text('Email'),
-                      TextField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          hintText: 'example@mail.com',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                    const Text('Email'),
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        hintText: 'example@mail.com',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 10),
+                    const SizedBox(height: 20),
 
-                      Text('Password'),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: 'Create password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: _loading ? null : register,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.violet400,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        child: _loading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                'Continue',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.white),
+                              ),
                       ),
-
-                      SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: _loading ? null : register,
-
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.violet400,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 18),
-                          ),
-                          child: Text(
-                            'Create an account',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
+
             Padding(
-              padding: const EdgeInsets.only(bottom: 32.0),
+              padding: const EdgeInsets.only(bottom: 32),
               child: Text(
                 'By using Neura, you agree to the \n Terms and Privacy Policy.',
                 style: Theme.of(context).textTheme.labelSmall,

@@ -99,6 +99,8 @@ class _FocusSessionState extends State<FocusSession> {
                                 .map((e) => e.packageName)
                                 .toList(),
                             subtasks: subTasks.map((e) => e.title).toList(),
+                            source: FocusSource.focusSession,
+                            needPermission: true, // 🔥 WAJIB
                           ),
                         ),
                       ),
