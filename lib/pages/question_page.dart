@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 // import 'package:hackathon_app/pages/deep_read_page.dart';
-import 'package:hackathon_app/pages/success_page.dart';
-import 'package:hackathon_app/services/reading_progress_service.dart';
+// import 'package:hackathon_app/pages/success_page.dart';
+// import 'package:hackathon_app/services/reading_progress_service.dart';
+import 'package:hackathon_app/pages/review_answer_page.dart';
+import 'package:hackathon_app/models/question_models.dart';
 // import 'package:hackathon_app/models/article_meta.dart';
-
-class Question {
-  final String question;
-  final List<String>? options; // null = input
-  final bool isInput;
-
-  Question({required this.question, this.options, this.isInput = false});
-}
 
 class QuestionPage extends StatefulWidget {
   const QuestionPage({super.key});
@@ -20,6 +14,7 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
+  final List<UserAnswer> userAnswers = [];
   int _currentIndex = 0;
   String? _selectedOption;
   final TextEditingController _answerController = TextEditingController();
@@ -35,6 +30,7 @@ class _QuestionPageState extends State<QuestionPage> {
         'They thought learning languages was only for children',
         'They did not enjoy learning languages',
       ],
+      correctIndex: 1,
     ),
     Question(
       question:
@@ -45,6 +41,7 @@ class _QuestionPageState extends State<QuestionPage> {
         'Studying linguistics in college',
         'Moving to another country',
       ],
+      correctIndex: 1,
     ),
     Question(
       question:
@@ -54,6 +51,17 @@ class _QuestionPageState extends State<QuestionPage> {
   ];
 
   void _nextQuestion() {
+    userAnswers.add(
+      UserAnswer(
+        questionIndex: _currentIndex,
+        selectedOption: _selectedOption != null
+            ? _questions[_currentIndex].options!.indexOf(_selectedOption!)
+            : null,
+        textAnswer: _answerController.text.isNotEmpty
+            ? _answerController.text
+            : null,
+      ),
+    );
     if (_currentIndex < _questions.length - 1) {
       setState(() {
         _currentIndex++;
@@ -61,17 +69,19 @@ class _QuestionPageState extends State<QuestionPage> {
         _answerController.clear();
       });
     } else {
-      ReadingProgressService.addReadingSession(
-        // minutes: widget.articleMeta.duration,
-        minutes: 10,
-      );
-      ReadingProgressService.addQuestionsAnswered(
-        _questions.length, // jumlah soal (3)
-      );
+      // ReadingProgressService.addReadingSession(
+      //   // minutes: widget.articleMeta.duration,
+      //   minutes: 10,
+      // );
+      // ReadingProgressService.addQuestionsAnswered(
+      //   _questions.length, // jumlah soal (3)
+      // );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const SuccessPage()),
-        // (route) => false,
+        MaterialPageRoute(
+          builder: (_) =>
+              ReviewAnswerPage(questions: _questions, userAnswers: userAnswers),
+        ),
       ); // selesai → balik ke DeepRead
     }
   }

@@ -2,14 +2,15 @@ from passlib.context import CryptContext
 import random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-load_dotenv()
-
 import os
 import smtplib
 from email.message import EmailMessage
 
+load_dotenv()
+
 SMTP_EMAIL = os.getenv("SMTP_EMAIL")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+print("ENV LOADED:", SMTP_EMAIL, SMTP_PASSWORD)
 
 pwd_context = CryptContext(
     schemes=["argon2"],
@@ -19,39 +20,40 @@ pwd_context = CryptContext(
 def hash_password(password: str):
     return pwd_context.hash(password)
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
-
 
 def generate_otp():
     return str(random.randint(100000, 999999))
-
 
 def otp_expiry():
     return datetime.utcnow() + timedelta(minutes=5)
 
 def send_otp_email(to_email: str, otp: str):
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        raise RuntimeError("SMTP credentials are not set")
+
     msg = EmailMessage()
     msg["Subject"] = "Your Neura verification code"
     msg["From"] = SMTP_EMAIL
     msg["To"] = to_email
-    
-    print("SMTP_EMAIL:", SMTP_EMAIL)
-    print("SMTP_PASSWORD:", SMTP_PASSWORD)
 
+    # Debug log (boleh dihapus di production)
+    print("SMTP_EMAIL:", SMTP_EMAIL)
+    print("SMTP_PASSWORD:", "SET" if SMTP_PASSWORD else "NOT SET")
 
     msg.set_content(f"""
-    Hi 👋
+Hi 👋
 
-    Your verification code is:
+Your verification code is:
 
-    {otp}
+{otp}
 
-    This code will expire in 5 minutes.
-    If you did not request this, please ignore this email.
+This code will expire in 5 minutes.
+If you did not request this email, please ignore it.
 
-    — Neura Team
-    """)
+— Neura Team
+""")
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(SMTP_EMAIL, SMTP_PASSWORD)
@@ -74,6 +76,3 @@ def calculate_persona(answers: list[int]) -> str:
         return "ping_pong"
     else:
         return "butterfly"
-
-
-

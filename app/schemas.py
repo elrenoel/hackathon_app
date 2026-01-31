@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 from datetime import datetime
 
 # =======================
@@ -13,7 +13,9 @@ class SubtaskBase(BaseModel):
     todo_id: int
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
+        model_config = ConfigDict(from_attributes=True)
+
 
 class SubtaskCreate(BaseModel):
     title: str
@@ -24,7 +26,9 @@ class SubtaskResponse(BaseModel):
     is_done: bool
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
+        model_config = ConfigDict(from_attributes=True)
+
         
 # OTP Schema
 
@@ -70,7 +74,8 @@ class UserResponse(UserBase):
     name: str
 
     class Config:
-        from_attributes = True
+        # from_attributes = True
+        model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -102,7 +107,9 @@ class TodoResponse(BaseModel):
     subtasks: list[SubtaskResponse] = []
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
+        model_config = ConfigDict(from_attributes=True)
+
 
 
 # Profilling User
