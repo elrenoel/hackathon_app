@@ -23,6 +23,18 @@ class _MapAnaliticsPageState extends State<MapAnaliticsPage> {
     });
   }
 
+  String getDailyInsight() {
+    final acc = ReadingProgressService.accuracyToday;
+
+    if (acc >= 0.8) {
+      return 'Excellent focus today. Your comprehension stayed consistent.';
+    } else if (acc >= 0.5) {
+      return 'Good effort. Try slowing down on complex sections.';
+    } else {
+      return 'Focus dipped today. Consider shorter sessions tomorrow.';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,16 +99,55 @@ class _MapAnaliticsPageState extends State<MapAnaliticsPage> {
               const SizedBox(height: 20),
 
               Text(
-                'Today’s Summary',
+                'Today Summary',
                 style: Theme.of(context).textTheme.labelLarge,
               ),
-
               const SizedBox(height: 12),
+
               Container(
                 width: double.infinity,
-                child: _MiniStatCard(
-                  value: '${ReadingProgressService.questionsAnsweredToday}',
-                  label: 'questions answered\ntoday',
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${ReadingProgressService.minutesReadToday} minutes focused',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                    const SizedBox(height: 6),
+
+                    Text(
+                      '${ReadingProgressService.correctAnswersToday}'
+                      ' / ${ReadingProgressService.questionsAnsweredToday} correct answers',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    LinearProgressIndicator(
+                      value: ReadingProgressService.accuracyToday,
+                      backgroundColor: Colors.grey.shade300,
+                      color: const Color(0xFF7C4DFF),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Focus Level: ${ReadingProgressService.lastFocusLevel ?? "-"}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      getDailyInsight(),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.black54),
+                    ),
+                  ],
                 ),
               ),
               // ================= WEEKLY RECAP =================
@@ -252,7 +303,7 @@ class _FocusTimeMeter extends StatelessWidget {
             backgroundColor: const Color(0xFFE0E0E0),
           ),
           SizedBox(height: 4),
-          Text('0 hour — 5 hour', style: TextStyle(fontSize: 10)),
+          Text('0 hour — 1 hour', style: TextStyle(fontSize: 10)),
         ],
       ),
     );

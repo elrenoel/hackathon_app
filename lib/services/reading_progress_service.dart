@@ -18,6 +18,11 @@ class ReadingProgressService {
     articlesReadToday += 1;
   }
 
+  static double get accuracyToday {
+    if (questionsAnsweredToday == 0) return 0;
+    return correctAnswersToday / questionsAnsweredToday;
+  }
+
   static void resetToday() {
     minutesReadToday = 0;
     articlesReadToday = 0;

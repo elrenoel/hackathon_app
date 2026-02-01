@@ -1,12 +1,20 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-# GANTI sesuai DB lu
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:ayamgoreng@localhost/Flutter"
+# 🔥 LOAD .env dari ROOT
+load_dotenv()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-# engine.connect()
-# print("db connected")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+print("DATABASE_URL =", DATABASE_URL)  # DEBUG
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL not loaded")
+
+engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
@@ -15,7 +23,6 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
