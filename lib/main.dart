@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'main_app.dart';
 import 'package:hackathon_app/pages/welcome_page.dart';
+import 'package:hackathon_app/providers/auth_provider.dart';
 
+// void main() {
+//   runApp(MyApp());
+// }
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()..checkAuth()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +55,24 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: WelcomePage(),
+      home: Consumer<AuthProvider>(
+        builder: (_, auth, __) {
+          // ⏳ Masih cek token
+          if (!auth.isInitialized) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // ✅ Sudah login
+          if (auth.isLoggedIn) {
+            return const MainApp();
+          }
+
+          // ❌ Belum login
+          return const WelcomePage();
+        },
+      ),
     );
   }
 }

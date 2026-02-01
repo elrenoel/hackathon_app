@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/app_start_page.dart';
-import 'package:hackathon_app/services/auth_service.dart';
+// import 'package:hackathon_app/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:hackathon_app/providers/auth_provider.dart';
 // import 'package:hackathon_app/pages/home_page.dart';
 
 class SignInWithEmail extends StatefulWidget {
@@ -16,21 +18,21 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
   final TextEditingController _controllerPassword = TextEditingController();
 
   bool _obscure = true;
-  bool _loading = false;
+  // bool _loading = false;
   bool get hasTypingEmail => _controllerEmail.text.isNotEmpty;
-  bool get hasTypingPassword => _controllerEmail.text.isNotEmpty;
+  bool get hasTypingPassword => _controllerPassword.text.isNotEmpty;
 
   Future<void> _handleLogin() async {
-    setState(() => _loading = true);
-    final success = await AuthService.login(
+    final auth = context.read<AuthProvider>();
+
+    final success = await auth.login(
       _controllerEmail.text.trim(),
       _controllerPassword.text.trim(),
     );
 
     if (!mounted) return;
 
-    setState(() => _loading = false);
-    if (success && mounted) {
+    if (success) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const AppStartPage()),
@@ -112,43 +114,36 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
 
                   SizedBox(height: 5),
 
-                  // Row(
-                  //   spacing: 2,
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Icon(Icons.error_outline, color: AppColors.redPrimary),
-                  //     Expanded(
-                  //       child: Text(
-                  //         'Oops! Email or password incorrect try another one.',
-                  //         style: Theme.of(context).textTheme.bodySmall
-                  //             ?.copyWith(color: AppColors.redPrimary),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed:
-                          hasTypingEmail && hasTypingPassword && !_loading
-                          ? _handleLogin
-                          : null,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: hasTypingEmail && hasTypingPassword
-                            ? AppColors.violet400
-                            : AppColors.violet200,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  Consumer<AuthProvider>(
+                    builder: (_, auth, __) {
+                      return SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: auth.isLoading
+                              ? null
+                              : (hasTypingEmail && hasTypingPassword
+                                    ? _handleLogin
+                                    : null),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.violet400,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                          ),
+                          child: auth.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text('Log in'),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                      ),
-                      child: Text(
-                        'Log in',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-                      ),
-                    ),
+                      );
+                    },
                   ),
 
                   SizedBox(height: 5),

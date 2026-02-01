@@ -3,14 +3,11 @@ import random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-import smtplib
-from email.message import EmailMessage
+import resend
+
 
 load_dotenv()
-
-SMTP_EMAIL = os.getenv("SMTP_EMAIL")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-print("ENV LOADED:", SMTP_EMAIL, SMTP_PASSWORD)
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 pwd_context = CryptContext(
     schemes=["argon2"],
@@ -29,35 +26,20 @@ def generate_otp():
 def otp_expiry():
     return datetime.utcnow() + timedelta(minutes=5)
 
+
 def send_otp_email(to_email: str, otp: str):
-    if not SMTP_EMAIL or not SMTP_PASSWORD:
-        raise RuntimeError("SMTP credentials are not set")
+    resend.Emails.send({
+        "from": os.getenv("EMAIL_FROM"),  # contoh: Neura <onboarding@resend.dev>
+        "to": to_email,
+        "subject": "Your Neura verification code",
+        "html": f"""
+        <h2>Your verification code</h2>
+        <p><strong>{otp}</strong></p>
+        <p>This code will expire in 5 minutes.</p>
+        """
+    })
 
-    msg = EmailMessage()
-    msg["Subject"] = "Your Neura verification code"
-    msg["From"] = SMTP_EMAIL
-    msg["To"] = to_email
 
-    # Debug log (boleh dihapus di production)
-    print("SMTP_EMAIL:", SMTP_EMAIL)
-    print("SMTP_PASSWORD:", "SET" if SMTP_PASSWORD else "NOT SET")
-
-    msg.set_content(f"""
-Hi 👋
-
-Your verification code is:
-
-{otp}
-
-This code will expire in 5 minutes.
-If you did not request this email, please ignore it.
-
-— Neura Team
-""")
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(SMTP_EMAIL, SMTP_PASSWORD)
-        smtp.send_message(msg)
 
 def calculate_persona(answers: list[int]) -> str:
     score = 0
