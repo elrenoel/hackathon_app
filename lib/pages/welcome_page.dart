@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:hackathon_app/main_app.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:hackathon_app/main_app.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:hackathon_app/color/app_colors.dart';
 import 'package:hackathon_app/pages/sign_in/sign_in_page.dart';
@@ -16,28 +16,28 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  @override
-  void initState() {
-    super.initState();
-    _checkAutoLogin();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _checkAutoLogin();
+  // }
 
-  Future<void> _checkAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("access_token");
+  // Future<void> _checkAutoLogin() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString("access_token");
 
-    // kasih delay dikit biar splash keliatan halus
-    await Future.delayed(const Duration(milliseconds: 800));
+  //   // kasih delay dikit biar splash keliatan halus
+  //   await Future.delayed(const Duration(milliseconds: 800));
 
-    if (!mounted) return;
+  //   if (!mounted) return;
 
-    if (token != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainApp()),
-      );
-    }
-  }
+  //   if (token != null) {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const MainApp()),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
