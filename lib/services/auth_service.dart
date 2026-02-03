@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hackathon_app/core/storage/token_storage.dart';
 
 class AuthService {
   static const String baseUrl =
@@ -137,10 +138,10 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString("access_token", data["access_token"]);
+      await TokenStorage.saveToken(data["access_token"]);
       return true;
     }
+
     return false;
   }
 

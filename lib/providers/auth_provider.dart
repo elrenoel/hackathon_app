@@ -11,10 +11,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get isInitialized => _isInitialized;
 
-  AuthProvider() {
-    checkAuth();
-  }
-
   /// DIPANGGIL SAAT APP START
   Future<void> checkAuth() async {
     final token = await TokenStorage.getToken();

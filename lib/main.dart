@@ -57,6 +57,9 @@ class MyApp extends StatelessWidget {
       ),
       home: Consumer<AuthProvider>(
         builder: (_, auth, __) {
+          debugPrint(
+            "AUTH → initialized=${auth.isInitialized}, loggedIn=${auth.isLoggedIn}",
+          );
           // ⏳ Masih cek token
           if (!auth.isInitialized) {
             return const Scaffold(

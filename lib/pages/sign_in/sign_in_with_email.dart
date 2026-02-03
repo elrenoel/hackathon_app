@@ -30,9 +30,7 @@ class _SignInWithEmailState extends State<SignInWithEmail> {
       _controllerPassword.text.trim(),
     );
 
-    if (!mounted) return;
-
-    if (success) {
+    if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Email atau password salah")),
       );
