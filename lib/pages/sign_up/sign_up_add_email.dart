@@ -16,6 +16,7 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
   final _emailController = TextEditingController();
 
   bool _loading = false;
+  bool _cooldown = false;
 
   @override
   void dispose() {
@@ -25,6 +26,14 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
   }
 
   Future<void> register() async {
+    if (_cooldown) return;
+
+    setState(() => _cooldown = true);
+
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) setState(() => _cooldown = false);
+    });
+
     if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -39,11 +48,18 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
       email: _emailController.text.trim(),
     );
 
+    print("REGISTER RESULT: $error");
+
     if (!mounted) return;
 
     setState(() => _loading = false);
 
-    if (error == null) {
+    // =========================
+    // HANYA JIKA BENAR2 SUKSES
+    // =========================
+    if (error == null ||
+        error.toLowerCase().contains("otp sent") ||
+        error.toLowerCase().contains("already sent")) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -51,11 +67,11 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
               SignUpVerificationEmail(email: _emailController.text.trim()),
         ),
       );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
+      return;
     }
+
+    // tampilkan semua error
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
 
   @override
@@ -118,7 +134,7 @@ class _SignUpAddEmailState extends State<SignUpAddEmail> {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
-                        onPressed: _loading ? null : register,
+                        onPressed: (_loading || _cooldown) ? null : register,
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.violet400,
                           padding: const EdgeInsets.symmetric(vertical: 18),

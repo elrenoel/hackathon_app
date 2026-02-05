@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hackathon_app/core/storage/token_storage.dart';
 
 class AuthService {
-  static const String baseUrl =
-      "https://hackathonapp-production-5ce0.up.railway.app";
-  // static const String baseUrl = "http://192.168.18.19:8000";
+  // static const String baseUrl ="https://hackathonapp-production-5ce0.up.railway.app";
+  // static const String baseUrl = "http://10.168.12.193:8000";
+  static const String baseUrl = "http://10.0.2.2:8000"; // Flutter Web
   // kalau HP fisik → ganti IP laptop
 
   static const _tokenKey = 'access_token';
@@ -32,14 +32,30 @@ class AuthService {
         body: jsonEncode({'name': name, 'email': email}),
       );
 
-      if (response.statusCode == 200) {
+      print("STATUS: ${response.statusCode}");
+      print("BODY RAW: ${response.body}");
+
+      // kalau server error
+      if (response.statusCode >= 500) {
+        return "Server error. Coba lagi nanti";
+      }
+
+      // cek apakah JSON valid
+      dynamic data;
+      try {
+        data = jsonDecode(response.body);
+      } catch (e) {
+        return "Server response invalid";
+      }
+
+      if (response.statusCode == 200 && data["success"] == true) {
         return null;
       }
 
-      final data = jsonDecode(response.body);
-      return data['detail'] ?? 'Failed to send OTP';
+      return data["detail"] ?? data["message"] ?? "Failed send OTP";
     } catch (e) {
-      return 'Network error';
+      print("ERROR SEND OTP: $e");
+      return "Network error";
     }
   }
 

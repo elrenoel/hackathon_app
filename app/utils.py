@@ -38,6 +38,10 @@ def send_otp_email(to_email: str, otp: str):
         <p>This code will expire in 5 minutes.</p>
         """
     })
+    
+    print("RESEND KEY:", os.getenv("RESEND_API_KEY"))
+    print("EMAIL FROM:", os.getenv("EMAIL_FROM"))
+
 
 
 
